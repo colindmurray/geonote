@@ -16,6 +16,6 @@
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="130dp"
-        android:src="@drawable/Internet_Explorer_7_Logo"/>
+        android:src="@drawable/ieisbest"/>
 
 </RelativeLayout>
