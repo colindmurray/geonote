@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">GeoNote</string>
-    <string name="hello_world">IE WILL CONSUME YOU!</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">GeoPost</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>

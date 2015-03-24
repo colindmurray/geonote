@@ -1,4 +1,4 @@
-package com.example.geonote.geonote;
+package info.geopost.geopost;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
