@@ -20,6 +20,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
 
@@ -28,12 +32,33 @@ public class MapsActivity extends FragmentActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private Marker mMarker;
     private ArrayList<Marker> mMarkers;
+    private static final String TAG = MapsActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Parse.initialize(this, "AeKErBzCZNVuE31Tn2Cu5dezE6zRtmgmmgAndHGG", "eQuaeK38iRN9mi2YJyQ8z1HHopWoMk9XKuOsSJLf");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         mMarkers = new ArrayList<>();
         setUpMapIfNeeded();
+        ParseUser user = new ParseUser();
+        user.setUsername("netscape");
+        user.setPassword("iesucks");
+        user.setEmail("getposthq@gmail.com");
+
+        user.put("phone", "512-666-1234");
+
+        user.signUpInBackground(new SignUpCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null){
+                    //Sign up was good.  Can use app.
+                }
+                else{
+                    Log.e(TAG, "Error in sign up is: " + e.toString());
+                }
+            }
+        });
     }
 
     @Override
