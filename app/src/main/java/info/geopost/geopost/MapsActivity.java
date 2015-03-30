@@ -1,22 +1,12 @@
 package info.geopost.geopost;
 
-import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -29,17 +19,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
-import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 import com.parse.ui.ParseLoginBuilder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,14 +49,17 @@ public class MapsActivity extends FragmentActivity {
     // Conversion from kilometers to meters
     private static final int METERS_PER_KILOMETER = 1000;
     private static final float DEFAULT_SEARCH_DISTANCE = 250.0f;
+    private static final long PARSE_QUERY_TIMEOUT = 30000;
 
     private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
     private FloatingActionButton mPostButton;
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
     private LatLng mLastLocation = new LatLng(0.0, 0.0);
-    private HashMap<String, Marker> mMapMarkers = new HashMap<>();;
+    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
     private String mSelectedPostObjectId;
+    private long mLastParseQueryTime;
+    private LatLng mLastParseQueryLocation;
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
 
@@ -83,6 +73,7 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
 
         setupParse();
+        Log.e("Current User", "Current user is: " + ParseUser.getCurrentUser());
         mPostButton = (FloatingActionButton) findViewById(R.id.map_post_button);
         mPostButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -280,8 +271,11 @@ public class MapsActivity extends FragmentActivity {
 
                 // No errors, process query results
                 // 1
+                mLastParseQueryTime = System.currentTimeMillis();
+                mLastParseQueryLocation = mCurrentLocation;
                 Set<String> toKeep = new HashSet<>();
-                Log.d("Parse", "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
+                if (objects != null)
+                    Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
                 for (GeoPostObj post : objects) {
                     // 3
                     toKeep.add(post.getObjectId());
@@ -382,10 +376,10 @@ public class MapsActivity extends FragmentActivity {
             mCurrentLocation = currentLocation;
             Log.d("Location", "Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
             // Perform mapQuery if current vs last location within certain distance interval.
-            if(mLastLocation != null) {
-                ParseGeoPoint lastLoc = new ParseGeoPoint(mLastLocation.latitude, mLastLocation.longitude);
+            if(mLastParseQueryLocation != null) {
+                ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
                 ParseGeoPoint curLoc = new ParseGeoPoint(mCurrentLocation.latitude, mCurrentLocation.longitude);
-                if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE) {
+                if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE || ((System.currentTimeMillis() - mLastParseQueryTime) > PARSE_QUERY_TIMEOUT) ) {
                     doMapQuery();
                 }
             }
