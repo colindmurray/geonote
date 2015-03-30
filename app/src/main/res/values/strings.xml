@@ -11,4 +11,7 @@
     <string name="character_count_placeholder">0/140</string>
     <string name="progress_post">Posting&#8230;</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="post_out_of_range">Can\'t view post! Get closer.</string>
+    <string name="parse_app_id">AeKErBzCZNVuE31Tn2Cu5dezE6zRtmgmmgAndHGG</string>
+    <string name="parse_client_id">eQuaeK38iRN9mi2YJyQ8z1HHopWoMk9XKuOsSJLf</string>
 </resources>

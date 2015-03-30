@@ -2,6 +2,7 @@ package info.geopost.geopost;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -49,6 +50,11 @@ public class MapsActivity extends FragmentActivity {
     public static final String INTENT_EXTRA_LOCATION = "location";
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
     private static final int MAX_POST_SEARCH_RESULTS = 50;
+    private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
+    private static final String PREF_CURRENT_LAT = "mCurrentLat";
+    private static final String PREF_CURRENT_LON = "mCurrentLon";
+    private static final String PREF_LAST_LAT = "mLastLat";
+    private static final String PREF_LAST_LON = "mLastLon";
     // Conversion from feet to meters
     private static final float METERS_PER_FEET = 0.3048f;
 
@@ -56,27 +62,25 @@ public class MapsActivity extends FragmentActivity {
     private static final int METERS_PER_KILOMETER = 1000;
     private static final float DEFAULT_SEARCH_DISTANCE = 250.0f;
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private Marker mMarker;
-    private ArrayList<Marker> mMarkers;
+    private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
     private FloatingActionButton mPostButton;
-    private LatLng mCurrentLocation;
-    private LatLng mLastLocation;
+    private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
+    private LatLng mLastLocation = new LatLng(0.0, 0.0);
     private HashMap<String, Marker> mMapMarkers = new HashMap<>();;
     private String mSelectedPostObjectId;
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
 
+    // Access basic application info
+    private SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Parse.initialize(this, "AeKErBzCZNVuE31Tn2Cu5dezE6zRtmgmmgAndHGG", "eQuaeK38iRN9mi2YJyQ8z1HHopWoMk9XKuOsSJLf");
-        ParseObject.registerSubclass(GeoPostObj.class);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        mMarkers = new ArrayList<>();
-        setUpMapIfNeeded();
-//        ParseUser user = new ParseUser();
+        setupParse();
         String username = "colin";
         String password = "lovesie";
 //        user.setUsername("poop");
@@ -122,13 +126,97 @@ public class MapsActivity extends FragmentActivity {
             }
         });
 
+        mPrefs = getSharedPreferences("GeoNote_prefs", MODE_PRIVATE);
+
+        if (savedInstanceState == null) {
+            double currentLat = mPrefs.getFloat(PREF_CURRENT_LAT, 0);
+            double currentLon = mPrefs.getFloat(PREF_CURRENT_LON, 0);
+            double lastLat = mPrefs.getFloat(PREF_LAST_LAT, 0);
+            double lastLon = mPrefs.getFloat(PREF_LAST_LON, 0);
+            mCurrentLocation = new LatLng(currentLat, currentLon);
+            mLastLocation = new LatLng(lastLat, lastLon);
+            Log.d("MapsActivity", "onCreate getting saved prefs:\n" +
+                    "curLat: " + mCurrentLocation.latitude +
+                    " curLon: " + mCurrentLocation.longitude +
+                    " lastLat: " + mLastLocation.latitude +
+                    " lastLon: " + mLastLocation.longitude);
+        }
+
+        setUpMapIfNeeded();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putDouble(PREF_CURRENT_LAT, mCurrentLocation.latitude);
+        outState.putDouble(PREF_CURRENT_LON, mCurrentLocation.longitude);
+        outState.putDouble(PREF_LAST_LAT, mLastLocation.latitude);
+        outState.putDouble(PREF_LAST_LON, mLastLocation.longitude);
+        Log.d("MapsActivity", "Saving instance state:\n" +
+                "curLat: " + mCurrentLocation.latitude +
+                " curLon: " + mCurrentLocation.longitude +
+                " lastLat: " + mLastLocation.latitude +
+                " lastLon: " + mLastLocation.longitude);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle outState) {
+        super.onRestoreInstanceState(outState);
+        double currentLat = outState.getDouble(PREF_CURRENT_LAT, 0.0);
+        double currentLon = outState.getDouble(PREF_CURRENT_LON, 0.0);
+        double lastLat = outState.getDouble(PREF_LAST_LAT, 0.0);
+        double lastLon = outState.getDouble(PREF_LAST_LON, 0.0);
+
+        mCurrentLocation = new LatLng(currentLat, currentLon);
+        mLastLocation = new LatLng(lastLat, lastLon);
+        Log.d("MapsActivity", "Restoring instance state:\n" +
+                "curLat: " + mCurrentLocation.latitude +
+                " curLon: " + mCurrentLocation.longitude +
+                " lastLat: " + mLastLocation.latitude +
+                " lastLon: " + mLastLocation.longitude);
+
+    }
+
+    private void setupParse() {
+        Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_id));
+        ParseObject.registerSubclass(GeoPostObj.class);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        double currentLat = mPrefs.getFloat(PREF_CURRENT_LAT, 0);
+        double currentLon = mPrefs.getFloat(PREF_CURRENT_LON, 0);
+        double lastLat = mPrefs.getFloat(PREF_LAST_LAT, 0);
+        double lastLon = mPrefs.getFloat(PREF_LAST_LON, 0);
+        mCurrentLocation = new LatLng(currentLat, currentLon);
+        mLastLocation = new LatLng(lastLat, lastLon);
         setUpMapIfNeeded();
         doMapQuery();
+        Log.d("MapsActivity", "onResume restoring saved prefs:\n" +
+                "curLat: " + mCurrentLocation.latitude +
+                " curLon: " + mCurrentLocation.longitude +
+                " lastLat: " + mLastLocation.latitude +
+                " lastLon: " + mLastLocation.longitude);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences.Editor ed = mPrefs.edit();
+        ed.putFloat(PREF_CURRENT_LAT, (float) mCurrentLocation.latitude);
+        ed.putFloat(PREF_CURRENT_LON, (float) mCurrentLocation.longitude);
+        ed.putFloat(PREF_LAST_LAT, (float) mLastLocation.latitude);
+        ed.putFloat(PREF_LAST_LON, (float) mLastLocation.longitude);
+        ed.apply();
+
+        Log.d("MapsActivity", "onStop saving prefs:\n" +
+                "curLat: " + mCurrentLocation.latitude +
+                " curLon: " + mCurrentLocation.longitude +
+                " lastLat: " + mLastLocation.latitude +
+                " lastLon: " + mLastLocation.longitude);
     }
 
     protected void setMessage() {
@@ -175,9 +263,17 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationChangeListener(myLocationChangeListener);
+        // Move map camera to saved location if one exists.
+        if(mCurrentLocation.latitude != 0.0 && mCurrentLocation.longitude != 0.0) {
+            CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+            Log.d("MapsActivity", "setUpMap restoring camera position to:\n" +
+                    "curLat: " + mCurrentLocation.latitude +
+                    " curLon: " + mCurrentLocation.longitude);
+        }
+
     }
 
 
@@ -190,6 +286,7 @@ public class MapsActivity extends FragmentActivity {
             return;
         }
         // 2
+        Log.d("Parse", "doMapQuery called.");
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         // 3
         ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
@@ -208,34 +305,72 @@ public class MapsActivity extends FragmentActivity {
                 // No errors, process query results
                 // 1
                 Set<String> toKeep = new HashSet<>();
-                // 2
+                Log.d("Parse", "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
                 for (GeoPostObj post : objects) {
                     // 3
                     toKeep.add(post.getObjectId());
-                    // 4
+                    /*
+                    We want to optimize the marker display logic and avoid adding markers that
+                    are currently visible on the map view. The mapMarkers variable contains a hash
+                    map of previously saved map markers. We're looking for a marker for the AnywallPost
+                    object we're currently looping through. We set up oldMarker to check mapMarkers
+                    for an entry corresponding to the current AnywallPost object.
+                    */
                     Marker oldMarker = mMapMarkers.get(post.getObjectId());
-                    // 5
+                    // We then initialize a new MarkerOptions to hold the marker properties starting with the AnywallPost location.
                     MarkerOptions markerOpts =
                             new MarkerOptions().position(new LatLng(post.getLocation().getLatitude(), post
                                     .getLocation().getLongitude()));
-                    // 6
+                    /*
+                    Next, we want to set up additional marker properties based on whether the marker
+                    is within the user's search radius preference or not. We also make sure not to add
+                    a marker if it already exists and has the desired properties.
+                     */
                     if (post.getLocation().distanceInKilometersTo(myPoint) > mRadius * METERS_PER_FEET
                             / METERS_PER_KILOMETER) {
                         // Set up an out-of-range marker
+                        if (oldMarker != null) {
+                            if (oldMarker.getSnippet() == null) {
+                                continue;
+                            } else {
+                                oldMarker.remove();
+                            }
+                        }
+                        markerOpts =
+                                markerOpts.title(getResources().getString(R.string.post_out_of_range))
+                                        .icon(BitmapDescriptorFactory.defaultMarker(
+                                                BitmapDescriptorFactory.HUE_RED));
                     }
                     else {
                         // Set up an in-range marker
+                        if (oldMarker != null) {
+                            if (oldMarker.getSnippet() != null) {
+                                continue;
+                            } else {
+                                oldMarker.remove();
+                            }
+                        }
+                        markerOpts =
+                                markerOpts.title(post.getText())
+                                        .snippet(post.getUser().getUsername())
+                                        .icon(BitmapDescriptorFactory.defaultMarker(
+                                                BitmapDescriptorFactory.HUE_GREEN));
                     }
-                    // 7
+                    // Next, we add the marker to the map's view and also add it to the mapMarkers hash of currently visible markers.
                     Marker marker = mMap.addMarker(markerOpts);
                     mMapMarkers.put(post.getObjectId(), marker);
-                    // 8
+                    /*
+                    We keep track of the currently selected post's id in the selectedPostObjectId
+                    private field. This helps maintain UI consistency whenever queries are updated
+                    whilst a marker is selected. If the current AnywallPost object was previously
+                    selected, we call the showInfoWindow() marker method to display the post details.
+                     */
                     if (post.getObjectId().equals(mSelectedPostObjectId)) {
                         marker.showInfoWindow();
                         mSelectedPostObjectId = null;
                     }
                 }
-                // 9
+                // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
                 cleanUpMarkers(toKeep);
             }
         });
@@ -262,19 +397,21 @@ public class MapsActivity extends FragmentActivity {
             if(mCurrentLocation != null) {
                 mLastLocation = mCurrentLocation;
             }
-            mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            Log.d("Location", "Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
-//            LatLng loc2 = new LatLng(location.getLatitude()+0.005, location.getLongitude()+0.005);
-//            Log.d("Location", "Lat: " + loc2.latitude  +"Lon: " + loc2.longitude);
-//            LatLng loc3 = new LatLng(location.getLatitude()-0.005, location.getLongitude());
-//            Log.d("Location", "Lat: " + loc2.latitude  +"Lon: " + loc2.longitude);
-//            mMarkers.add(mMap.addMarker(new MarkerOptions().position(mCurrentLocation).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
-//            mMarkers.add(mMap.addMarker(new MarkerOptions().position(loc2).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))));
-//            mMarkers.add(mMap.addMarker(new MarkerOptions().position(loc3).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
 
-            if(mMap != null){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLocation, 16.0f));
-//                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            // Set camera location if no saved location state exists.
+            if(mMap != null && mCurrentLocation != null && mCurrentLocation.latitude == 0.0 && mCurrentLocation.longitude == 0.0){
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16.0f));
+            }
+            mCurrentLocation = currentLocation;
+            Log.d("Location", "Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
+            // Perform mapQuery if current vs last location within certain distance interval.
+            if(mLastLocation != null) {
+                ParseGeoPoint lastLoc = new ParseGeoPoint(mLastLocation.latitude, mLastLocation.longitude);
+                ParseGeoPoint curLoc = new ParseGeoPoint(mCurrentLocation.latitude, mCurrentLocation.longitude);
+                if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE) {
+                    doMapQuery();
+                }
             }
         }
     };
