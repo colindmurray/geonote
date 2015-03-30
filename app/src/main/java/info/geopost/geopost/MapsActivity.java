@@ -100,7 +100,7 @@ public class MapsActivity extends FragmentActivity {
             double lastLon = mPrefs.getFloat(PREF_LAST_LON, 0);
             mCurrentLocation = new LatLng(currentLat, currentLon);
             mLastLocation = new LatLng(lastLat, lastLon);
-            Log.d("MapsActivity", "onCreate getting saved prefs:\n" +
+            Log.d(TAG, "onCreate getting saved prefs:\n" +
                     "curLat: " + mCurrentLocation.latitude +
                     " curLon: " + mCurrentLocation.longitude +
                     " lastLat: " + mLastLocation.latitude +
@@ -118,7 +118,7 @@ public class MapsActivity extends FragmentActivity {
         outState.putDouble(PREF_CURRENT_LON, mCurrentLocation.longitude);
         outState.putDouble(PREF_LAST_LAT, mLastLocation.latitude);
         outState.putDouble(PREF_LAST_LON, mLastLocation.longitude);
-        Log.d("MapsActivity", "Saving instance state:\n" +
+        Log.d(TAG, "Saving instance state:\n" +
                 "curLat: " + mCurrentLocation.latitude +
                 " curLon: " + mCurrentLocation.longitude +
                 " lastLat: " + mLastLocation.latitude +
@@ -135,7 +135,7 @@ public class MapsActivity extends FragmentActivity {
 
         mCurrentLocation = new LatLng(currentLat, currentLon);
         mLastLocation = new LatLng(lastLat, lastLon);
-        Log.d("MapsActivity", "Restoring instance state:\n" +
+        Log.d(TAG, "Restoring instance state:\n" +
                 "curLat: " + mCurrentLocation.latitude +
                 " curLon: " + mCurrentLocation.longitude +
                 " lastLat: " + mLastLocation.latitude +
@@ -161,7 +161,7 @@ public class MapsActivity extends FragmentActivity {
         mLastLocation = new LatLng(lastLat, lastLon);
         setUpMapIfNeeded();
         doMapQuery();
-        Log.d("MapsActivity", "onResume restoring saved prefs:\n" +
+        Log.d(TAG, "onResume restoring saved prefs:\n" +
                 "curLat: " + mCurrentLocation.latitude +
                 " curLon: " + mCurrentLocation.longitude +
                 " lastLat: " + mLastLocation.latitude +
@@ -179,7 +179,7 @@ public class MapsActivity extends FragmentActivity {
         ed.putFloat(PREF_LAST_LON, (float) mLastLocation.longitude);
         ed.apply();
 
-        Log.d("MapsActivity", "onStop saving prefs:\n" +
+        Log.d(TAG, "onStop saving prefs:\n" +
                 "curLat: " + mCurrentLocation.latitude +
                 " curLon: " + mCurrentLocation.longitude +
                 " lastLat: " + mLastLocation.latitude +
@@ -236,7 +236,7 @@ public class MapsActivity extends FragmentActivity {
         if(mCurrentLocation.latitude != 0.0 && mCurrentLocation.longitude != 0.0) {
             CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
-            Log.d("MapsActivity", "setUpMap restoring camera position to:\n" +
+            Log.d(TAG, "setUpMap restoring camera position to:\n" +
                     "curLat: " + mCurrentLocation.latitude +
                     " curLon: " + mCurrentLocation.longitude);
         }
@@ -253,7 +253,7 @@ public class MapsActivity extends FragmentActivity {
             return;
         }
         // 2
-        Log.d("Parse", "doMapQuery called.");
+        Log.d(TAG, "doMapQuery called.");
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         // 3
         ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
@@ -374,7 +374,7 @@ public class MapsActivity extends FragmentActivity {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16.0f));
             }
             mCurrentLocation = currentLocation;
-            Log.d("Location", "Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
+            Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
             // Perform mapQuery if current vs last location within certain distance interval.
             if(mLastParseQueryLocation != null) {
                 ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
