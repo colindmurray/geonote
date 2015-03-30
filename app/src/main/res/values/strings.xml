@@ -3,5 +3,7 @@
 
     <string name="app_name">GeoPost</string>
     <string name="title_activity_maps">Map</string>
+    <string name="parse_app_id">AeKErBzCZNVuE31Tn2Cu5dezE6zRtmgmmgAndHGG</string>
+    <string name="parse_client_key">eQuaeK38iRN9mi2YJyQ8z1HHopWoMk9XKuOsSJLf</string>
 
 </resources>

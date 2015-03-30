@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GeoPost.iml" filepath="$PROJECT_DIR$/GeoPost.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/libs/ParseLoginUI/ParseLoginUI.iml" filepath="$PROJECT_DIR$/app/libs/ParseLoginUI/ParseLoginUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/geopost.iml" filepath="$PROJECT_DIR$/geopost.iml" />
     </modules>
   </component>
 </project>

@@ -24,6 +24,7 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+import com.parse.ui.ParseLoginBuilder;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,8 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         mMarkers = new ArrayList<>();
+        ParseLoginBuilder builder = new ParseLoginBuilder(MapsActivity.this);
+        startActivityForResult(builder.build(), 0);
         setUpMapIfNeeded();
         ParseUser user = new ParseUser();
         user.setUsername("netscape");
@@ -48,17 +51,17 @@ public class MapsActivity extends FragmentActivity {
 
         user.put("phone", "512-666-1234");
 
-        user.signUpInBackground(new SignUpCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null){
-                    //Sign up was good.  Can use app.
-                }
-                else{
-                    Log.e(TAG, "Error in sign up is: " + e.toString());
-                }
-            }
-        });
+//        user.signUpInBackground(new SignUpCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (e == null){
+//                    //Sign up was good.  Can use app.
+//                }
+//                else{
+//                    Log.e(TAG, "Error in sign up is: " + e.toString());
+//                }
+//            }
+//        });
     }
 
     @Override
