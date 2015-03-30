@@ -10,8 +10,10 @@
         android:id="@+id/login_username_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColorHint="#AAAAAA"
         style="@style/ParseLoginUI.EditText"
-        android:hint="@string/com_parse_ui_username_input_hint" />
+        android:hint="@string/com_parse_ui_username_input_hint"
+        android:textColor="@android:color/white" />
 
     <EditText
         android:id="@+id/login_password_input"
@@ -22,7 +24,9 @@
         android:fontFamily="sans-serif"
         android:hint="@string/com_parse_ui_password_input_hint"
         android:inputType="textPassword"
-        android:selectAllOnFocus="true" />
+        android:selectAllOnFocus="true"
+        android:textColorHint="#AAAAAA"
+        android:textColor="@android:color/white" />
 
     <LinearLayout
         android:id="@+id/parse_buttons"
@@ -51,4 +55,4 @@
         android:layout_marginBottom="@dimen/com_parse_ui_small_vertical_spacing"
         android:text="@string/com_parse_ui_forgot_password_button_label" />
 </LinearLayout>
-<!-- From: file:/C:/Users/Majisto/Desktop/geopost/app/libs/ParseLoginUI/res/layout/com_parse_ui_parse_login_form.xml --><!-- From: file:/C:/Users/Majisto/Desktop/geopost/app/libs/ParseLoginUI/build/intermediates/bundles/debug/res/layout/com_parse_ui_parse_login_form.xml -->
+<!-- From: file:/home/colin/Github/GeoPost/app/libs/ParseLoginUI/res/layout/com_parse_ui_parse_login_form.xml --><!-- From: file:/home/colin/Github/GeoPost/app/libs/ParseLoginUI/build/intermediates/bundles/debug/res/layout/com_parse_ui_parse_login_form.xml -->

@@ -293,7 +293,7 @@ containing a value of this type.
         public static int com_facebook_list_section_header_background=0x7f020014;
         public static int com_facebook_loginbutton_silver=0x7f020015;
         public static int com_facebook_logo=0x7f020016;
-        public static int com_facebook_picker_default_separator_color=0x7f020035;
+        public static int com_facebook_picker_default_separator_color=0x7f020036;
         public static int com_facebook_picker_item_background=0x7f020017;
         public static int com_facebook_picker_list_focused=0x7f020018;
         public static int com_facebook_picker_list_longpressed=0x7f020019;
@@ -324,6 +324,7 @@ containing a value of this type.
         public static int com_parse_ui_parse_login_button_background_selector=0x7f020032;
         public static int com_parse_ui_twitter_login_button_background_selector=0x7f020033;
         public static int com_parse_ui_twitter_login_logo=0x7f020034;
+        public static int neon_ie=0x7f020035;
     }
     public static final class id {
         public static int app_logo=0x7f090026;
@@ -356,7 +357,7 @@ containing a value of this type.
         public static int com_facebook_usersettingsfragment_login_button=0x7f090025;
         public static int com_facebook_usersettingsfragment_logo_image=0x7f090023;
         public static int com_facebook_usersettingsfragment_profile_name=0x7f090024;
-        public static int create_account=0x7f090038;
+        public static int create_account=0x7f090036;
         public static int facebook_login=0x7f090031;
         public static int inline=0x7f090004;
         public static int large=0x7f090009;
@@ -374,9 +375,7 @@ containing a value of this type.
         public static int parse_signup_button=0x7f09002c;
         public static int picker_subtitle=0x7f09001b;
         public static int right=0x7f090008;
-        public static int signup_confirm_password_input=0x7f090035;
-        public static int signup_email_input=0x7f090036;
-        public static int signup_name_input=0x7f090037;
+        public static int signup_email_input=0x7f090035;
         public static int signup_password_input=0x7f090034;
         public static int signup_username_input=0x7f090033;
         public static int small=0x7f09000b;
