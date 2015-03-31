@@ -22,7 +22,6 @@ public class DispatchActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dispatch);
         Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
         if (ParseUser.getCurrentUser() != null){
             String user = ParseUser.getCurrentUser().getUsername();

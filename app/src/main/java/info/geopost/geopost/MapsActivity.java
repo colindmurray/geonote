@@ -112,6 +112,11 @@ public class MapsActivity extends FragmentActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putDouble(PREF_CURRENT_LAT, mCurrentLocation.latitude);
