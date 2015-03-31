@@ -40,6 +40,7 @@ public class DispatchActivity extends ActionBarActivity {
         Log.e(TAG, String.format("Request code is: %d and result code is: %d", requestCode, resultCode));
         if (resultCode == RESULT_OK){
             startActivity(new Intent(this, MapsActivity.class));
+            finish();
         }
         else if (resultCode == RESULT_CANCELED){
             finish();

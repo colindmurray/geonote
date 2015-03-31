@@ -17,7 +17,7 @@
         android:allowBackup="true"
         android:icon="@drawable/neon_ie"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -29,11 +29,6 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
             android:screenOrientation="portrait" >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
         </activity>
         <activity
             android:name="com.parse.ui.ParseLoginActivity"
@@ -59,12 +54,13 @@
         <activity
             android:name=".PostActivity"
             android:label="@string/title_activity_post"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
             android:name=".DispatchActivity"
-            android:label="@string/title_activity_dispatch"
-            android:noHistory="true">
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_dispatch">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
