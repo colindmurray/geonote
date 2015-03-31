@@ -73,7 +73,7 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
 
         setupParse();
-        Log.e("Current User", "Current user is: " + ParseUser.getCurrentUser());
+        Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
         mPostButton = (FloatingActionButton) findViewById(R.id.map_post_button);
         mPostButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -144,10 +144,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
     private void setupParse() {
-        Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
-        ParseObject.registerSubclass(GeoPostObj.class);
-        ParseLoginBuilder builder = new ParseLoginBuilder(MapsActivity.this);
-        startActivityForResult(builder.build(), 0);
+          ParseObject.registerSubclass(GeoPostObj.class);
     }
 
     @Override
