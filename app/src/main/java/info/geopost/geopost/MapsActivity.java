@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -87,6 +88,24 @@ public class MapsActivity extends ActionBarActivity
         mTitle = getTitle();
 
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout)findViewById(R.id.drawer_layout));
+
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost.setup();
+
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("map");
+        tabSpec.setContent(R.id.tabMap);
+        tabSpec.setIndicator("Map");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("table");
+        tabSpec.setContent(R.id.tabTable);
+        tabSpec.setIndicator("Table");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("profile");
+        tabSpec.setContent(R.id.tabProfile);
+        tabSpec.setIndicator("Profile");
+        tabHost.addTab(tabSpec);
 
         setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());

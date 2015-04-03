@@ -24,4 +24,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_example">Example action</string>
+
+
+    //tab titles
+    <string name="tabMap">Map</string>
+    <string name="tabTable">Table</string>
+    <string name="tabProfile">Profile</string>
 </resources>
