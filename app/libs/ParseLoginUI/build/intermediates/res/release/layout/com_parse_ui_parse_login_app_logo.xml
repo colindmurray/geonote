@@ -5,4 +5,4 @@
     android:layout_height="wrap_content"
     android:src="@drawable/com_parse_ui_app_logo"
     android:contentDescription="@string/com_parse_ui_logo_content_description" />
-<!-- From: file:/Users/MrJeremyT/AndroidStudioProjects/geopost/app/libs/ParseLoginUI/res/layout/com_parse_ui_parse_login_app_logo.xml -->
+<!-- From: file:/C:/Users/Majisto/Desktop/geopost/app/libs/ParseLoginUI/res/layout/com_parse_ui_parse_login_app_logo.xml -->

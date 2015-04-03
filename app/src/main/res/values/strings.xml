@@ -25,4 +25,9 @@
 
     <string name="action_example">Example action</string>
     <string name="logout">Logout</string>
+
+    //tab titles
+    <string name="tabMap">Map</string>
+    <string name="tabTable">Table</string>
+    <string name="tabProfile">Profile</string>
 </resources>
