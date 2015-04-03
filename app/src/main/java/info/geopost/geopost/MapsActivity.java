@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -411,15 +412,32 @@ public class MapsActivity extends ActionBarActivity
         }
     };
 
+    //Called when item selected.
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         FragmentManager fragmentManager = getSupportFragmentManager();
+        Log.e(TAG, "Position is: " + position);
+        switch(position){
+            case 1:
+                logoutParseUser();
+        }
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
                 .commit();
     }
 
-
+    private void logoutParseUser(){
+        ParseUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null){
+                    Toast.makeText(getApplicationContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MapsActivity.this , DispatchActivity.class));
+                    finish();
+            } //TODO Add error checking.
+            }
+        });
+    }
 
     /**
      * A placeholder fragment containing a simple view.
