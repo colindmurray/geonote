@@ -1,14 +1,20 @@
 package info.geopost.geopost;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -21,13 +27,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.ui.ParseLoginBuilder;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapsActivity extends ActionBarActivity {
+public class MapsActivity extends ActionBarActivity
+            implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
@@ -59,13 +64,18 @@ public class MapsActivity extends ActionBarActivity {
     private FloatingActionButton mPostButton;
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
     private LatLng mLastLocation = new LatLng(0.0, 0.0);
-    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
-    private HashMap<String, GeoPostObj> mGeoPostObjects = new HashMap<>();
+//    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
+    private HashMap<String, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
     private String mSelectedPostObjectId;
     private long mLastParseQueryTime;
     private LatLng mLastParseQueryLocation;
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
+
+    //navigation drawer
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    private CharSequence mTitle;
 
     // Access basic application info
     private SharedPreferences mPrefs;
@@ -75,9 +85,14 @@ public class MapsActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment)getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mTitle = getTitle();
+
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout)findViewById(R.id.drawer_layout));
+
         setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
         mPostButton = (FloatingActionButton) findViewById(R.id.map_post_button);
@@ -116,6 +131,8 @@ public class MapsActivity extends ActionBarActivity {
         setUpMapIfNeeded();
 
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -194,10 +211,6 @@ public class MapsActivity extends ActionBarActivity {
                 " lastLon: " + mLastLocation.longitude);
     }
 
-    protected void setMessage() {
-
-    }
-
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
@@ -225,7 +238,8 @@ public class MapsActivity extends ActionBarActivity {
             }
             mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                 public void onCameraChange(CameraPosition position) {
-                    doMapQuery();
+                    // TODO possibly get new markers when moving map?
+                    //doMapQuery();
                 }
             });
         }
@@ -290,16 +304,21 @@ public class MapsActivity extends ActionBarActivity {
                 if (objects != null)
                     Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
                 for (GeoPostObj post : objects) {
-                    // 3
+
                     toKeep.add(post.getObjectId());
-                    mGeoPostObjects.put(post.getObjectId(), post);
-                    /*
-                    We want to optimize the marker display logic and avoid adding markers that
-                    are currently visible on the map view. The mapMarkers variable contains a hash
-                    map of previously saved map markers. We're looking for a marker for the AnywallPost
-                    object we're currently looping through. We set up oldMarker to check mapMarkers
-                    for an entry corresponding to the current AnywallPost object.
-                    */
+                    GeoPostMarker oldMarker = mGeoPostMarkers.get(post.getObjectId());
+                    LatLng loc = latLngFromParseGeoPoint(post.getLocation());
+
+                    if(oldMarker == null) {
+                        GeoPostMarker newMarker;
+                        if(getDistanceInMeters(loc, mCurrentLocation) <= mRadius) {
+                            newMarker = new GeoPostMarker(post, newEnabledMarker(post),  true);
+                        } else {
+                            newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
+                        }
+                        mGeoPostMarkers.put(post.getObjectId(), newMarker);
+                    }
+
 //                    Marker oldMarker = mMapMarkers.get(post.getObjectId());
 //                    // We then initialize a new MarkerOptions to hold the marker properties starting with the AnywallPost location.
 //                    MarkerOptions markerOpts =
@@ -357,7 +376,6 @@ public class MapsActivity extends ActionBarActivity {
 
                 // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
                 cleanUpMarkers(toKeep);
-                recalculateUserMarkerDistances();
             }
         });
     }
@@ -366,13 +384,15 @@ public class MapsActivity extends ActionBarActivity {
         return new ParseGeoPoint(loc.latitude, loc.longitude);
     }
 
+    private LatLng latLngFromParseGeoPoint(ParseGeoPoint point) {
+        return new LatLng(point.getLatitude(), point.getLongitude());
+    }
+
     private void cleanUpMarkers(Set<String> markersToKeep) {
-        for (String objId : new HashSet<>(mMapMarkers.keySet())) {
+        for (String objId : new HashSet<>(mGeoPostMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
-                Marker marker = mMapMarkers.get(objId);
-                marker.remove();
-                mMapMarkers.get(objId).remove();
-                mMapMarkers.remove(objId);
+                mGeoPostMarkers.get(objId).marker.remove();
+                mGeoPostMarkers.remove(objId);
             }
         }
     }
@@ -407,26 +427,41 @@ public class MapsActivity extends ActionBarActivity {
     };
 
     private void recalculateUserMarkerDistances(){
-        for(Map.Entry entry : mMapMarkers.entrySet()) {
-            String postId = (String) entry.getKey();
-            Marker marker = (Marker) entry.getValue();
-            if(getDistanceInMeters(marker.getPosition(), mCurrentLocation) <= mRadius) {
-                enableMarker(postId, marker);
+        for(Map.Entry entry : mGeoPostMarkers.entrySet()) {
+            GeoPostMarker geoPostMarker = (GeoPostMarker) entry.getValue();
+            if(getDistanceInMeters(geoPostMarker.marker.getPosition(), mCurrentLocation) <= mRadius) {
+                enableMarker(geoPostMarker);
             } else {
-                disableMarker(postId, marker);
+                disableMarker(geoPostMarker);
             }
         }
     }
 
-    private void enableMarker(String postId, Marker marker) {
-        LatLng loc = marker.getPosition();
-        marker.remove();
-        mMapMarkers.put(postId, newEnabledMarker(postId, loc));
+    private void enableMarker(GeoPostMarker geoPostMarker) {
+        if(!geoPostMarker.enabled) {
+            geoPostMarker.marker.remove();
+            geoPostMarker.marker = newEnabledMarker(geoPostMarker.geoPostObj);
+            geoPostMarker.enabled = true;
+        }
     }
 
-    private Marker newEnabledMarker(String postId, LatLng loc) {
+//    private Marker newEnabledMarker(String postId) {
+//        //TODO: REDO TITLE AND SNIPPET LOGIC.
+//        GeoPostMarker geoPostMarker = mGeoPostMarkers.get(postId);
+//        LatLng loc = geoPostMarker.marker.getPosition();
+//        MarkerOptions markerOpts =
+//                new MarkerOptions().position(loc);
+//        markerOpts =
+//                markerOpts.title(geoPostMarker.geoPostObj.getText())
+//                        .snippet(geoPostMarker.geoPostObj.getUser().getUsername())
+//                        .icon(BitmapDescriptorFactory.defaultMarker(
+//                                BitmapDescriptorFactory.HUE_GREEN));
+//        return
+//    }
+
+    private Marker newEnabledMarker(GeoPostObj post) {
         //TODO: REDO TITLE AND SNIPPET LOGIC.
-        GeoPostObj post = mGeoPostObjects.get(postId);
+        LatLng loc = latLngFromParseGeoPoint(post.getLocation());
         MarkerOptions markerOpts =
                 new MarkerOptions().position(loc);
         markerOpts =
@@ -437,10 +472,12 @@ public class MapsActivity extends ActionBarActivity {
         return mMap.addMarker(markerOpts);
     }
 
-    private void disableMarker(String postId, Marker marker) {
-        LatLng loc = marker.getPosition();
-        marker.remove();
-        mMapMarkers.put(postId, newDisabledMarker(loc));
+    private void disableMarker(GeoPostMarker geoPostMarker) {
+        if(geoPostMarker.enabled) {
+            LatLng loc = geoPostMarker.marker.getPosition();
+            geoPostMarker.marker.remove();
+            geoPostMarker.marker = newDisabledMarker(loc);
+        }
     }
 
     private Marker newDisabledMarker(LatLng loc) {
@@ -451,6 +488,10 @@ public class MapsActivity extends ActionBarActivity {
                         .icon(BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED));
         return mMap.addMarker(markerOpts);
+    }
+
+    private Marker newDisabledMarker(GeoPostObj post) {
+        return newDisabledMarker(latLngFromParseGeoPoint(post.getLocation()));
     }
 
     private float getDistanceInMeters(LatLng loc1, LatLng loc2) {
@@ -464,4 +505,75 @@ public class MapsActivity extends ActionBarActivity {
         return results[0];
     }
 
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .commit();
+    }
+
+
+
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        public PlaceholderFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            return rootView;
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((MapsActivity) activity).onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+    private void onSectionAttached(int number) {
+        switch (number) {
+            case 1:
+                mTitle = getString(R.string.title_section1);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_section2);
+                break;
+            case 3:
+                mTitle = getString(R.string.title_section3);
+                break;
+        }
+    }
 }
