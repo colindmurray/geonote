@@ -16,12 +16,18 @@
     <string name="post_out_of_range">Can\'t view post! Get closer.</string>
     <string name="title_activity_dispatch">GeoPost</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
+    <string name="title_section1">Not Logout</string>
+    <string name="title_section2">Logout</string>
     <string name="title_section3">Section 3</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_example">Example action</string>
+    <string name="logout">Logout</string>
+
+    //tab titles
+    <string name="tabMap">Map</string>
+    <string name="tabTable">Table</string>
+    <string name="tabProfile">Profile</string>
 </resources>

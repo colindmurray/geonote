@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -40,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class MapsActivity extends ActionBarActivity
-            implements NavigationDrawerFragment.NavigationDrawerCallbacks{
+            implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
@@ -92,6 +94,24 @@ public class MapsActivity extends ActionBarActivity
         mTitle = getTitle();
 
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout)findViewById(R.id.drawer_layout));
+
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost.setup();
+
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("map");
+        tabSpec.setContent(R.id.tabMap);
+        tabSpec.setIndicator("Map");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("table");
+        tabSpec.setContent(R.id.tabTable);
+        tabSpec.setIndicator("Table");
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("profile");
+        tabSpec.setContent(R.id.tabProfile);
+        tabSpec.setIndicator("Profile");
+        tabHost.addTab(tabSpec);
 
         setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
@@ -427,6 +447,7 @@ public class MapsActivity extends ActionBarActivity
     };
 
     private void recalculateUserMarkerDistances(){
+        Log.d(TAG, "Recalculating user markers.");
         for(Map.Entry entry : mGeoPostMarkers.entrySet()) {
             GeoPostMarker geoPostMarker = (GeoPostMarker) entry.getValue();
             if(getDistanceInMeters(geoPostMarker.marker.getPosition(), mCurrentLocation) <= mRadius) {
@@ -439,6 +460,7 @@ public class MapsActivity extends ActionBarActivity
 
     private void enableMarker(GeoPostMarker geoPostMarker) {
         if(!geoPostMarker.enabled) {
+            Log.d(TAG, "Enabling marker. post_id: " + geoPostMarker.geoPostObj.getObjectId());
             geoPostMarker.marker.remove();
             geoPostMarker.marker = newEnabledMarker(geoPostMarker.geoPostObj);
             geoPostMarker.enabled = true;
@@ -474,6 +496,7 @@ public class MapsActivity extends ActionBarActivity
 
     private void disableMarker(GeoPostMarker geoPostMarker) {
         if(geoPostMarker.enabled) {
+            Log.d(TAG, "Disabling marker post_id: " + geoPostMarker.geoPostObj.getObjectId());
             LatLng loc = geoPostMarker.marker.getPosition();
             geoPostMarker.marker.remove();
             geoPostMarker.marker = newDisabledMarker(loc);
@@ -506,15 +529,33 @@ public class MapsActivity extends ActionBarActivity
     }
 
 
+
+    //Called when item selected.
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         FragmentManager fragmentManager = getSupportFragmentManager();
+        Log.e(TAG, "Position is: " + position);
+        switch(position){
+            case 1:
+                logoutParseUser();
+        }
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
                 .commit();
     }
 
-
+    private void logoutParseUser(){
+        ParseUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null){
+                    Toast.makeText(getApplicationContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MapsActivity.this , DispatchActivity.class));
+                    finish();
+            } //TODO Add error checking.
+            }
+        });
+    }
 
     /**
      * A placeholder fragment containing a simple view.
