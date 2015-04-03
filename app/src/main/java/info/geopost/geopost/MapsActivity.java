@@ -487,7 +487,7 @@ public class MapsActivity extends ActionBarActivity
         MarkerOptions markerOpts =
                 new MarkerOptions().position(loc);
         markerOpts =
-                markerOpts.title(post.getText())
+                markerOpts.title(post.getTitle())
                         .snippet(post.getUser().getUsername())
                         .icon(BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_GREEN));
