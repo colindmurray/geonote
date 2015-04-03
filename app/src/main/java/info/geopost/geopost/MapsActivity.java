@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -151,8 +152,6 @@ public class MapsActivity extends ActionBarActivity
         setUpMapIfNeeded();
 
     }
-
-
 
     @Override
     public void onBackPressed() {
@@ -532,12 +531,19 @@ public class MapsActivity extends ActionBarActivity
 
     //Called when item selected.
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(View v, int position, long id) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Log.e(TAG, "Position is: " + position);
         switch(position){
+            case 0:
+//                TextView v = (TextView) mNavigationDrawerFragment.mDrawerListView.getChildAt(position);
+                TextView tv = (TextView) v;
+                tv.setText("Username: " + ParseUser.getCurrentUser().getUsername());
+                Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
+                break;
             case 1:
                 logoutParseUser();
+                break;
         }
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
@@ -611,9 +617,6 @@ public class MapsActivity extends ActionBarActivity
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
                 break;
         }
     }
