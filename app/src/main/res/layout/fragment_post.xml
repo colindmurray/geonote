@@ -42,4 +42,22 @@
         android:text="@string/character_count_placeholder"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ExpandableListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/expandableListView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="581dp"
+        android:layout_marginStart="581dp" />
+
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/expandableListView"
+        android:layout_alignEnd="@+id/expandableListView"
+        android:layout_marginTop="160dp"></TableRow>
+
 </RelativeLayout>
