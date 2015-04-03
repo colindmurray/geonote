@@ -32,6 +32,7 @@ import com.parse.ui.ParseLoginBuilder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MapsActivity extends ActionBarActivity {
@@ -59,6 +60,7 @@ public class MapsActivity extends ActionBarActivity {
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
     private LatLng mLastLocation = new LatLng(0.0, 0.0);
     private HashMap<String, Marker> mMapMarkers = new HashMap<>();
+    private HashMap<String, GeoPostObj> mGeoPostObjects = new HashMap<>();
     private String mSelectedPostObjectId;
     private long mLastParseQueryTime;
     private LatLng mLastParseQueryLocation;
@@ -68,12 +70,14 @@ public class MapsActivity extends ActionBarActivity {
     // Access basic application info
     private SharedPreferences mPrefs;
 
+    // Set map to current user location on first location event.
+    private boolean zoomToUserLocation = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
         setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
         mPostButton = (FloatingActionButton) findViewById(R.id.map_post_button);
@@ -288,6 +292,7 @@ public class MapsActivity extends ActionBarActivity {
                 for (GeoPostObj post : objects) {
                     // 3
                     toKeep.add(post.getObjectId());
+                    mGeoPostObjects.put(post.getObjectId(), post);
                     /*
                     We want to optimize the marker display logic and avoid adding markers that
                     are currently visible on the map view. The mapMarkers variable contains a hash
@@ -295,62 +300,64 @@ public class MapsActivity extends ActionBarActivity {
                     object we're currently looping through. We set up oldMarker to check mapMarkers
                     for an entry corresponding to the current AnywallPost object.
                     */
-                    Marker oldMarker = mMapMarkers.get(post.getObjectId());
-                    // We then initialize a new MarkerOptions to hold the marker properties starting with the AnywallPost location.
-                    MarkerOptions markerOpts =
-                            new MarkerOptions().position(new LatLng(post.getLocation().getLatitude(), post
-                                    .getLocation().getLongitude()));
-                    /*
-                    Next, we want to set up additional marker properties based on whether the marker
-                    is within the user's search radius preference or not. We also make sure not to add
-                    a marker if it already exists and has the desired properties.
-                     */
-                    if (post.getLocation().distanceInKilometersTo(myPoint) > mRadius * METERS_PER_FEET
-                            / METERS_PER_KILOMETER) {
-                        // Set up an out-of-range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() == null) {
-                                continue;
-                            } else {
-                                oldMarker.remove();
-                            }
-                        }
-                        markerOpts =
-                                markerOpts.title(getResources().getString(R.string.post_out_of_range))
-                                        .icon(BitmapDescriptorFactory.defaultMarker(
-                                                BitmapDescriptorFactory.HUE_RED));
-                    }
-                    else {
-                        // Set up an in-range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() != null) {
-                                continue;
-                            } else {
-                                oldMarker.remove();
-                            }
-                        }
-                        markerOpts =
-                                markerOpts.title(post.getText())
-                                        .snippet(post.getUser().getUsername())
-                                        .icon(BitmapDescriptorFactory.defaultMarker(
-                                                BitmapDescriptorFactory.HUE_GREEN));
-                    }
+//                    Marker oldMarker = mMapMarkers.get(post.getObjectId());
+//                    // We then initialize a new MarkerOptions to hold the marker properties starting with the AnywallPost location.
+//                    MarkerOptions markerOpts =
+//                            new MarkerOptions().position(new LatLng(post.getLocation().getLatitude(), post
+//                                    .getLocation().getLongitude()));
+//                    /*
+//                    Next, we want to set up additional marker properties based on whether the marker
+//                    is within the user's search radius preference or not. We also make sure not to add
+//                    a marker if it already exists and has the desired properties.
+//                     */
+//                    if (post.getLocation().distanceInKilometersTo(myPoint) > mRadius * METERS_PER_FEET
+//                            / METERS_PER_KILOMETER) {
+//                        // Set up an out-of-range marker
+//                        if (oldMarker != null) {
+//                            if (oldMarker.getSnippet() == null) {
+//                                continue;
+//                            } else {
+//                                oldMarker.remove();
+//                            }
+//                        }
+//                        markerOpts =
+//                                markerOpts.title(getResources().getString(R.string.post_out_of_range))
+//                                        .icon(BitmapDescriptorFactory.defaultMarker(
+//                                                BitmapDescriptorFactory.HUE_RED));
+//                    }
+//                    else {
+//                        // Set up an in-range marker
+//                        if (oldMarker != null) {
+//                            if (oldMarker.getSnippet() != null) {
+//                                continue;
+//                            } else {
+//                                oldMarker.remove();
+//                            }
+//                        }
+//                        markerOpts =
+//                                markerOpts.title(post.getText())
+//                                        .snippet(post.getUser().getUsername())
+//                                        .icon(BitmapDescriptorFactory.defaultMarker(
+//                                                BitmapDescriptorFactory.HUE_GREEN));
+//                    }
                     // Next, we add the marker to the map's view and also add it to the mapMarkers hash of currently visible markers.
-                    Marker marker = mMap.addMarker(markerOpts);
-                    mMapMarkers.put(post.getObjectId(), marker);
+//                    Marker marker = mMap.addMarker(markerOpts);
+//                    mMapMarkers.put(post.getObjectId(), marker);
                     /*
                     We keep track of the currently selected post's id in the selectedPostObjectId
                     private field. This helps maintain UI consistency whenever queries are updated
                     whilst a marker is selected. If the current AnywallPost object was previously
                     selected, we call the showInfoWindow() marker method to display the post details.
                      */
-                    if (post.getObjectId().equals(mSelectedPostObjectId)) {
-                        marker.showInfoWindow();
-                        mSelectedPostObjectId = null;
-                    }
+//                    if (post.getObjectId().equals(mSelectedPostObjectId)) {
+//                        marker.showInfoWindow();
+//                        mSelectedPostObjectId = null;
+//                    }
                 }
+
                 // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
                 cleanUpMarkers(toKeep);
+                recalculateUserMarkerDistances();
             }
         });
     }
@@ -377,13 +384,17 @@ public class MapsActivity extends ActionBarActivity {
                 mLastLocation = mCurrentLocation;
             }
 
-            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            // Set camera location if no saved location state exists.
-            if(mMap != null && mCurrentLocation != null && mCurrentLocation.latitude == 0.0 && mCurrentLocation.longitude == 0.0){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16.0f));
+            mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+            // Set camera location if this is first location event received (map has just been opened)
+            if(mMap != null && mCurrentLocation != null && zoomToUserLocation){
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLocation, 16.0f));
+                zoomToUserLocation = false;
             }
-            mCurrentLocation = currentLocation;
             Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
+
+            // disable markers now out of range, enable markers in range.
+            recalculateUserMarkerDistances();
             // Perform mapQuery if current vs last location within certain distance interval.
             if(mLastParseQueryLocation != null) {
                 ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
@@ -394,5 +405,63 @@ public class MapsActivity extends ActionBarActivity {
             }
         }
     };
+
+    private void recalculateUserMarkerDistances(){
+        for(Map.Entry entry : mMapMarkers.entrySet()) {
+            String postId = (String) entry.getKey();
+            Marker marker = (Marker) entry.getValue();
+            if(getDistanceInMeters(marker.getPosition(), mCurrentLocation) <= mRadius) {
+                enableMarker(postId, marker);
+            } else {
+                disableMarker(postId, marker);
+            }
+        }
+    }
+
+    private void enableMarker(String postId, Marker marker) {
+        LatLng loc = marker.getPosition();
+        marker.remove();
+        mMapMarkers.put(postId, newEnabledMarker(postId, loc));
+    }
+
+    private Marker newEnabledMarker(String postId, LatLng loc) {
+        //TODO: REDO TITLE AND SNIPPET LOGIC.
+        GeoPostObj post = mGeoPostObjects.get(postId);
+        MarkerOptions markerOpts =
+                new MarkerOptions().position(loc);
+        markerOpts =
+                markerOpts.title(post.getText())
+                        .snippet(post.getUser().getUsername())
+                        .icon(BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_GREEN));
+        return mMap.addMarker(markerOpts);
+    }
+
+    private void disableMarker(String postId, Marker marker) {
+        LatLng loc = marker.getPosition();
+        marker.remove();
+        mMapMarkers.put(postId, newDisabledMarker(loc));
+    }
+
+    private Marker newDisabledMarker(LatLng loc) {
+        MarkerOptions markerOpts =
+                new MarkerOptions().position(loc);
+        markerOpts =
+                markerOpts.title(getResources().getString(R.string.post_out_of_range))
+                        .icon(BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_RED));
+        return mMap.addMarker(markerOpts);
+    }
+
+    private float getDistanceInMeters(LatLng loc1, LatLng loc2) {
+        float[] results = new float[1];
+        Location.distanceBetween(
+                loc1.latitude,
+                loc1.longitude,
+                loc2.latitude,
+                loc2.longitude,
+                results);
+        return results[0];
+    }
 
 }
