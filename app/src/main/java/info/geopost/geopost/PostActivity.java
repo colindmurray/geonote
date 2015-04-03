@@ -34,6 +34,7 @@ public class PostActivity extends ActionBarActivity {
     private Button mPostButton;
     private ParseGeoPoint mGeoPoint;
     private EditText mPostEditText;
+    private EditText mTitleEditText;
     private TextView mCharacterCountTextView;
     private static final int MAX_CHARACTER_COUNT = 140;
 
@@ -53,6 +54,16 @@ public class PostActivity extends ActionBarActivity {
         mCharacterCountTextView = (TextView) findViewById(R.id.character_count_textview);
         mPostButton = (Button) findViewById(R.id.post_button);
         mPostEditText = (EditText) findViewById(R.id.post_edittext);
+        mTitleEditText = (EditText) findViewById(R.id.title_editText);
+
+        mTitleEditText.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+//                updatePostButtonState();
+                updateCharacterCountTextViewText();
+            }
+        });
 
         mPostEditText.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -79,8 +90,12 @@ public class PostActivity extends ActionBarActivity {
         return mPostEditText.getText().toString().trim();
     }
 
+    private String getTitleEditTextText () {
+        return mTitleEditText.getText().toString().trim();
+    }
+
     private void updatePostButtonState() {
-        int length = getPostEditTextText().length();
+        int length = getTitleEditTextText().length();
         boolean enabled = length > 0 && length < MAX_CHARACTER_COUNT;
         mPostButton.setEnabled(enabled);
     }
@@ -94,11 +109,13 @@ public class PostActivity extends ActionBarActivity {
         // 1
         GeoPostObj post = new GeoPostObj();
         post.setLocation(mGeoPoint);
+        String title = getTitleEditTextText();
         String text = getPostEditTextText();
         final ProgressDialog dialog = new ProgressDialog(PostActivity.this);
         dialog.setMessage(getString(R.string.progress_post));
         dialog.show();
         post.setText(text);
+        post.setTitle(title);
         post.setUser(ParseUser.getCurrentUser());
 
         // 2
