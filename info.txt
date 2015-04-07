@@ -1,0 +1,40 @@
+GeoPost™
+
+Daniel Durbin – dbd453
+Jeremy Thompson – jmt2939
+Colin “IE” Murray – cdm2697
+
+Instructions
+
+	GeoPost is designed to be a simple to use application.  Upon first installing the app, a registration screen will appear.  You can either type in your username and password to log in, or select the “Register” button.  We ask for a username, password and email.  Each email is associated with exactly one username.  It is possible to reset your password with a link below the login/register button.
+	Once you are signed in, a Google Map view is shown and centered on your location.  On the lower right is a green plus button to make a new post.  The post view allows you to put in a title (required) and a message body.  Once you are satisfied, you can click “Post” and it will bring you back to the Map screen with a marker placed at your location.  You can click on it to view the title and username.  We are working on a better view window.
+	On the left is a navigation drawer than can be slid out with a drag, or clicking the “hamburger” button in the action bar.  It displays the currently logged in user, and has a logout button to switch users.  There are also tabs below the action bar to switch to a list view of posts and a profile (To be implemented in the Beta). 
+	Posts can only be viewed within a particular radius from your current location.  This is relatively small (It’s about 1/8 of a mile).  One can view where posts are made with a much larger radius however.  This is currently ~100 miles.
+
+Original Goals for Alpha
+
+Alpha Version 
+Our goal for the alpha version is to have a functioning map view with the message creation system active and syncing to the database. We will likely not have comments or user accounts, but message creation, displaying, and database synching should be active. 
+a) APIs -- APIs hooked up, including database and Maps API. 
+b) Views/Activities -- Map view and New Post view working. 
+c) Database -- New Posts being successfully synced to database. 
+d) Message Viewing -- Ability to view all messages in database at current location. 
+e) Voting -- Voting system on messages. 
+
+Actually Implemented
+
+	All of our goals except for e have been implemented.  We expected that voting would be the most difficult and listed it last.  The database is synced in the background through Parse, and thanks to its SDK, we did not have to write much code to handle this.  We are also trying to save battery power by slowing down updates if the user hasn’t moved on each location refresh.  The main issue with voting is that we have not settled on a proper view for the posts.  We are thinking of doing a modal popup, but once that works, we cannot implement the buttons for voting.  Same goes for comments.
+
+Added Features
+
+	Most of the features we have implemented were already planned.  Saving battery life and data usage has always been an issue for us, so we are going to try various methods such as checking location change and storing the geopost objects locally.  Parse gave us the ability to handle user logins very easily, and we decided to not allow anonymous users at all.  This will help prevent spam posts at least a little bit we hope.
+
+Code From Other Sources
+
+	The majority of our third-party code comes from the Parse SDK and Google Maps API.  Parse has helped us immensely with doing the backend work of syncing data and handling user accounts.  We used their app, called Anywall, to model how to handle user accounts and making database models.  The entire ParseLoginUI sample app was imported as a module under our libs folder.
+	We use an activity called DispatchActivity that runs before the MapsActivity to check if a user is logged in or not.  This is where Parse gets initialized.  It magically stores the user and then we can start up the ParseLoginBuilder if there is no user.  Once this is done, we check the result code and call up MapsActivity.  The Navigation Drawer was also pulled from an external resource, but required some modifications on our part.
+
+Code We Wrote
+
+	Parse requires us to create an object.  We created a GeoPostObj.java file to model what we wanted to store.  It contains what a post would require such as title, user and location.  The Parse logic will then serialize it and send it off to the database to be stored.  We also store a System time with each post to check the refresh time.  The Google Map updates around every 10 seconds, but we do not always query Parse as quickly to minimize API calls.
+	The layouts were also mostly done by us, except for the registration window, and we are working on a custom icon.
