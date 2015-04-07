@@ -1,6 +1,7 @@
 package info.geopost.geopost;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -15,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +40,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -74,6 +79,11 @@ public class MapsActivity extends ActionBarActivity
     private LatLng mLastParseQueryLocation;
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
+
+    //hold on to the list returned by a Parse Query
+    private List<GeoPostObj> geoPostObjList;
+
+    private ListViewForGeoPost geoList;
 
     //navigation drawer
     private NavigationDrawerFragment mNavigationDrawerFragment;
@@ -281,13 +291,13 @@ public class MapsActivity extends ActionBarActivity
                     "curLat: " + mCurrentLocation.latitude +
                     " curLon: " + mCurrentLocation.longitude);
         }
-
+        geoList = new ListViewForGeoPost();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -317,6 +327,7 @@ public class MapsActivity extends ActionBarActivity
 
                 // No errors, process query results
                 // 1
+                geoPostObjList = objects;
                 mLastParseQueryTime = System.currentTimeMillis();
                 mLastParseQueryLocation = mCurrentLocation;
                 Set<String> toKeep = new HashSet<>();
@@ -620,4 +631,66 @@ public class MapsActivity extends ActionBarActivity
                 break;
         }
     }
+
+
+    public class ListViewForGeoPost extends Activity{
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_maps);
+
+            final ListView listView = (ListView) findViewById(R.id.listView);
+            final ArrayList<GeoPostObj> list = (ArrayList<GeoPostObj>) geoPostObjList;
+            String[] values = {};
+            final GeoPostArrayAdapter adapter = new GeoPostArrayAdapter(this, values);
+            listView.setAdapter(adapter);
+//            LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            inflater.inflate(R.id.listView, null, false);
+//            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+//                    final String item = (String)parent.getItemAtPosition(position);
+//                    view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            list.remove(item);
+//                            adapter.notifyDataSetChanged();
+//                            view.setAlpha(1);
+//                        }
+//                    });
+//                }
+//            });
+        }
+
+
+
+    }
+
+    public class GeoPostArrayAdapter extends ArrayAdapter<String>{
+        private final Context context;
+        private final String[] values;
+
+        public GeoPostArrayAdapter(Context context, String[] values){
+            super(context, R.layout.row_fragment, values);
+            this.context = context;
+            this.values = values;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent){
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.row_fragment, parent, false);
+            TextView title = (TextView) rowView.findViewById(R.id.row_title);
+            TextView description = (TextView) rowView.findViewById(R.id.row_description);
+            GeoPostObj tmp = geoPostObjList.get(position);
+            title.setText(tmp.getTitle());
+            description.setText(tmp.getText());
+            return rowView;
+        }
+
+
+
+    }
+
+
 }
