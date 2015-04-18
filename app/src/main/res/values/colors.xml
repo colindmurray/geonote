@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black_semi_transparent">#B2000000</color>
-    <color name="background">#e5e5e5</color>
-    <color name="half_black">#808080</color>
-    <color name="white">#fafafa</color>
-    <color name="white_pressed">#f1f1f1</color>
-    <color name="pink">#e91e63</color>
-    <color name="pink_pressed">#ec407a</color>
-    <color name="blue_semi_transparent">#805677fc</color>
-    <color name="blue_semi_transparent_pressed">#80738ffe</color>
-    <color name="blue">#0288D1</color>
-    <color name="blue_pressed">#03A9F4</color>
-    <color name="green">#2E7D32</color>
-    <color name="green_pressed">#43A047</color>
+    <!--<color name="black_semi_transparent">#B2000000</color>-->
+    <!--<color name="background">#e5e5e5</color>-->
+    <!--<color name="half_black">#808080</color>-->
+    <!--<color name="white">#fafafa</color>-->
+    <!--<color name="white_pressed">#f1f1f1</color>-->
+    <!--<color name="pink">#e91e63</color>-->
+    <!--<color name="pink_pressed">#ec407a</color>-->
+    <!--<color name="blue_semi_transparent">#805677fc</color>-->
+    <!--<color name="blue_semi_transparent_pressed">#80738ffe</color>-->
+    <!--<color name="blue">#0288D1</color>-->
+    <!--<color name="blue_pressed">#03A9F4</color>-->
+    <!--<color name="green">#2E7D32</color>-->
+    <!--<color name="green_pressed">#43A047</color>-->
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="accent">#4CAF50</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
 </resources>
