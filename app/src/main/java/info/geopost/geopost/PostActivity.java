@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.ButtonFlat;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseACL;
 import com.parse.ParseException;
@@ -31,7 +32,7 @@ import com.parse.SaveCallback;
 
 public class PostActivity extends ActionBarActivity {
 
-    private Button mPostButton;
+    private ButtonFlat mPostButton;
     private ParseGeoPoint mGeoPoint;
     private EditText mPostEditText;
     private EditText mTitleEditText;
@@ -52,7 +53,7 @@ public class PostActivity extends ActionBarActivity {
         mGeoPoint = new ParseGeoPoint(location.latitude, location.longitude);
 
         mCharacterCountTextView = (TextView) findViewById(R.id.character_count_textview);
-        mPostButton = (Button) findViewById(R.id.post_button);
+        mPostButton = (ButtonFlat) findViewById(R.id.post_button);
         mPostEditText = (EditText) findViewById(R.id.post_edittext);
         mTitleEditText = (EditText) findViewById(R.id.title_editText);
 
