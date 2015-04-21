@@ -32,4 +32,7 @@
     <string name="tabTable">Table</string>
     <string name="tabProfile">Profile</string>
 
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">GeoPost Map Fragment in the house!</string>
+
 </resources>

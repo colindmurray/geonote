@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="info.geopost.geopost.MainActivity">
+    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item
+        android:id="@+id/tb_contextual"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_visibility_white_24dp"
+        android:title="Contextual mode"/>
+
+    <item
+        android:id="@+id/tb_refresh"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_autorenew_white_24dp"
+        android:title="Refresh"/>
+
+    <group
+        android:id="@+id/tb_group_contextual">
+
+        <item
+            android:id="@+id/tb_done"
+            app:showAsAction="always"
+            android:icon="@drawable/ic_done_white_24dp"
+            android:title="Done"/>
+
+        <item
+            android:id="@+id/tb_done_all"
+            app:showAsAction="never"
+            android:icon="@drawable/ic_done_all_white_24dp"
+            android:title="Done all"/>
+
+    </group>
+</menu>
