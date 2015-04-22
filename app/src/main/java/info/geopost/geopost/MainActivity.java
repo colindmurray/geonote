@@ -1,12 +1,12 @@
 package info.geopost.geopost;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
@@ -95,7 +95,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -112,13 +111,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.tb_contextual:
-                mToolbarManager.setCurrentGroup(R.id.tb_group_contextual);
-                break;
-            case R.id.tb_done:
-            case R.id.tb_done_all:
-                mToolbarManager.setCurrentGroup(0);
-                break;
         }
         return true;
     }

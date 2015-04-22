@@ -16,7 +16,7 @@
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1976D2</color>
     <color name="primary_light">#BBDEFB</color>
-    <color name="accent">#4CAF50</color>
+    <color name="accent">#4CAF50</color> <!-- Highlighting under tab name -->
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
@@ -24,4 +24,12 @@
 
     <color name="tpi_checked">#FFFFFFFF</color>
     <color name="tpi_unchecked">#99FFFFFF</color>
+
+    <color name="rb_checked">#ff5196f7</color>
+    <color name="rb_unchecked">#FF6D6D6D</color>
+    <color name="rb_disable">#FFB0B0B0</color>
+
+    <color name="colorControlNormal">#FF78909C</color>
+    <color name="colorControlActivated">#FF03A9F4</color>
+    <color name="colorSwitchThumbNormal">#FF78909C</color>
 </resources>

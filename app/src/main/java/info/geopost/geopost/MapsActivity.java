@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -348,60 +347,6 @@ public class MapsActivity extends ActionBarActivity
                         }
                         mGeoPostMarkers.put(post.getObjectId(), newMarker);
                     }
-
-//                    Marker oldMarker = mMapMarkers.get(post.getObjectId());
-//                    // We then initialize a new MarkerOptions to hold the marker properties starting with the AnywallPost location.
-//                    MarkerOptions markerOpts =
-//                            new MarkerOptions().position(new LatLng(post.getLocation().getLatitude(), post
-//                                    .getLocation().getLongitude()));
-//                    /*
-//                    Next, we want to set up additional marker properties based on whether the marker
-//                    is within the user's search radius preference or not. We also make sure not to add
-//                    a marker if it already exists and has the desired properties.
-//                     */
-//                    if (post.getLocation().distanceInKilometersTo(myPoint) > mRadius * METERS_PER_FEET
-//                            / METERS_PER_KILOMETER) {
-//                        // Set up an out-of-range marker
-//                        if (oldMarker != null) {
-//                            if (oldMarker.getSnippet() == null) {
-//                                continue;
-//                            } else {
-//                                oldMarker.remove();
-//                            }
-//                        }
-//                        markerOpts =
-//                                markerOpts.title(getResources().getString(R.string.post_out_of_range))
-//                                        .icon(BitmapDescriptorFactory.defaultMarker(
-//                                                BitmapDescriptorFactory.HUE_RED));
-//                    }
-//                    else {
-//                        // Set up an in-range marker
-//                        if (oldMarker != null) {
-//                            if (oldMarker.getSnippet() != null) {
-//                                continue;
-//                            } else {
-//                                oldMarker.remove();
-//                            }
-//                        }
-//                        markerOpts =
-//                                markerOpts.title(post.getText())
-//                                        .snippet(post.getUser().getUsername())
-//                                        .icon(BitmapDescriptorFactory.defaultMarker(
-//                                                BitmapDescriptorFactory.HUE_GREEN));
-//                    }
-                    // Next, we add the marker to the map's view and also add it to the mapMarkers hash of currently visible markers.
-//                    Marker marker = mMap.addMarker(markerOpts);
-//                    mMapMarkers.put(post.getObjectId(), marker);
-                    /*
-                    We keep track of the currently selected post's id in the selectedPostObjectId
-                    private field. This helps maintain UI consistency whenever queries are updated
-                    whilst a marker is selected. If the current AnywallPost object was previously
-                    selected, we call the showInfoWindow() marker method to display the post details.
-                     */
-//                    if (post.getObjectId().equals(mSelectedPostObjectId)) {
-//                        marker.showInfoWindow();
-//                        mSelectedPostObjectId = null;
-//                    }
                 }
 
                 // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.

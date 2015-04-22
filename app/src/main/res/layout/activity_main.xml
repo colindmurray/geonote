@@ -20,15 +20,15 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:minHeight="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="?attr/colorPrimaryDark"
                 app:theme="@style/AppBar"/>
 
             <com.rey.material.widget.TabPageIndicator
                 style="@style/TabPageIndicator"
                 android:id="@+id/main_tpi"
-                android:layout_height="48dp"
+                android:layout_height="42dp"
                 android:layout_width="match_parent"
-                android:paddingLeft="60dp"
+                android:paddingLeft="@dimen/ldrawer_drawableSize"
                 android:clipToPadding="false"
                 android:background="?attr/colorPrimary"
                 android:fillViewport="false" />

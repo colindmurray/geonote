@@ -13,7 +13,7 @@
     <string name="post">Post</string>
     <string name="character_count_placeholder">0/140</string>
     <string name="progress_post">Posting&#8230;</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">GeoPost</string>
     <string name="post_out_of_range">Can\'t view post! Get closer.</string>
     <string name="title_activity_dispatch">GeoPost</string>
 
