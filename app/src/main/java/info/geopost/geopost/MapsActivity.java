@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,11 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.gc.materialdesign.views.ButtonFloatSmall;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -64,7 +68,7 @@ public class MapsActivity extends ActionBarActivity
 
     // Conversion from kilometers to meters
     private static final int METERS_PER_KILOMETER = 1000;
-    private static final float DEFAULT_SEARCH_DISTANCE = 250.0f;
+    private static final float DEFAULT_SEARCH_DISTANCE = METERS_PER_KILOMETER * 11;
     private static final long PARSE_QUERY_TIMEOUT = 30000;
 
     private GoogleMap mMap;
@@ -95,6 +99,9 @@ public class MapsActivity extends ActionBarActivity
 
     // Set map to current user location on first location event.
     private boolean zoomToUserLocation = true;
+
+    //dialog buttons
+    ButtonFloatSmall mUpvoteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +167,21 @@ public class MapsActivity extends ActionBarActivity
         }
 
         setUpMapIfNeeded();
+
+//        Testing modal
+        boolean wrapInScrollView = true;
+        MaterialDialog m = new MaterialDialog.Builder(this)
+                .customView(R.layout.activity_modal, wrapInScrollView)
+                .show();
+        mUpvoteButton = (ButtonFloatSmall) m.findViewById(R.id.buttonFloatSmall);
+        mUpvoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mUpvoteButton.setBackgroundColor(getResources().getColor(R.color.green));
+                mUpvoteButton.setDrawableIcon(getResources().getDrawable(R.drawable.up_vote_pressed));
+            }
+        });
 
     }
 
@@ -323,10 +345,6 @@ public class MapsActivity extends ActionBarActivity
         mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
             @Override
             public void done(List<GeoPostObj> objects, ParseException e) {
-                // Check for errors
-
-                // No errors, process query results
-                // 1
                 geoPostObjList = objects;
                 mLastParseQueryTime = System.currentTimeMillis();
                 mLastParseQueryLocation = mCurrentLocation;
@@ -348,60 +366,6 @@ public class MapsActivity extends ActionBarActivity
                         }
                         mGeoPostMarkers.put(post.getObjectId(), newMarker);
                     }
-
-//                    Marker oldMarker = mMapMarkers.get(post.getObjectId());
-//                    // We then initialize a new MarkerOptions to hold the marker properties starting with the AnywallPost location.
-//                    MarkerOptions markerOpts =
-//                            new MarkerOptions().position(new LatLng(post.getLocation().getLatitude(), post
-//                                    .getLocation().getLongitude()));
-//                    /*
-//                    Next, we want to set up additional marker properties based on whether the marker
-//                    is within the user's search radius preference or not. We also make sure not to add
-//                    a marker if it already exists and has the desired properties.
-//                     */
-//                    if (post.getLocation().distanceInKilometersTo(myPoint) > mRadius * METERS_PER_FEET
-//                            / METERS_PER_KILOMETER) {
-//                        // Set up an out-of-range marker
-//                        if (oldMarker != null) {
-//                            if (oldMarker.getSnippet() == null) {
-//                                continue;
-//                            } else {
-//                                oldMarker.remove();
-//                            }
-//                        }
-//                        markerOpts =
-//                                markerOpts.title(getResources().getString(R.string.post_out_of_range))
-//                                        .icon(BitmapDescriptorFactory.defaultMarker(
-//                                                BitmapDescriptorFactory.HUE_RED));
-//                    }
-//                    else {
-//                        // Set up an in-range marker
-//                        if (oldMarker != null) {
-//                            if (oldMarker.getSnippet() != null) {
-//                                continue;
-//                            } else {
-//                                oldMarker.remove();
-//                            }
-//                        }
-//                        markerOpts =
-//                                markerOpts.title(post.getText())
-//                                        .snippet(post.getUser().getUsername())
-//                                        .icon(BitmapDescriptorFactory.defaultMarker(
-//                                                BitmapDescriptorFactory.HUE_GREEN));
-//                    }
-                    // Next, we add the marker to the map's view and also add it to the mapMarkers hash of currently visible markers.
-//                    Marker marker = mMap.addMarker(markerOpts);
-//                    mMapMarkers.put(post.getObjectId(), marker);
-                    /*
-                    We keep track of the currently selected post's id in the selectedPostObjectId
-                    private field. This helps maintain UI consistency whenever queries are updated
-                    whilst a marker is selected. If the current AnywallPost object was previously
-                    selected, we call the showInfoWindow() marker method to display the post details.
-                     */
-//                    if (post.getObjectId().equals(mSelectedPostObjectId)) {
-//                        marker.showInfoWindow();
-//                        mSelectedPostObjectId = null;
-//                    }
                 }
 
                 // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.

@@ -27,9 +27,9 @@
     <string name="action_example">Example action</string>
     <string name="logout">Logout</string>
 
-    //tab titles
-    <string name="tabMap">Map</string>
-    <string name="tabTable">Table</string>
-    <string name="tabProfile">Profile</string>
+
+    <string name="title_activity_modal">ModalActivity</string>
+    <string name="post_comment">Poster\'s comment goes in this area!</string>
+    <string name="username_temp">\@Xx_username_xX</string>
 
 </resources>
