@@ -1,6 +1,5 @@
 package info.geopost.geopost;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -60,7 +59,15 @@ public class TableFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_table, container, false);
+        View view = inflater.inflate(R.layout.fragment_table, container, false);
+//        Card card = new Card(getActivity());
+//        CardHeader header = new CardHeader(container.getContext());
+//        card.addCardHeader(header);
+//
+//        CardViewNative cardView = (CardViewNative) getActivity().findViewById(R.id.carddemo);
+//        cardView.setCard(card);
+        return view;
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

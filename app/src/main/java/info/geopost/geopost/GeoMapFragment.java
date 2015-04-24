@@ -48,7 +48,7 @@ public class GeoMapFragment extends Fragment {
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
-    private static final int MAX_POST_SEARCH_RESULTS = 50;
+    private static final int MAX_POST_SEARCH_RESULTS = 75;
     private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
     private static final String PREF_CURRENT_LAT = "mCurrentLat";
     private static final String PREF_CURRENT_LON = "mCurrentLon";
@@ -57,7 +57,7 @@ public class GeoMapFragment extends Fragment {
 
     // Conversion from kilometers to meters
     private static final int METERS_PER_KILOMETER = 1000;
-    private static final float DEFAULT_SEARCH_DISTANCE = 250.0f;
+    private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
     private static final long PARSE_QUERY_TIMEOUT = 30000;
 
     private GoogleMap mMap;
@@ -83,8 +83,6 @@ public class GeoMapFragment extends Fragment {
 
     // Set map to current user location on first location event.
     private boolean zoomToUserLocation = true;
-
-    private OnFragmentInteractionListener mListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -125,7 +123,7 @@ public class GeoMapFragment extends Fragment {
                 LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
                 // 3
                 Intent intent = new Intent(getActivity(), PostActivity.class);
-                intent.putExtra(MapsActivity.INTENT_EXTRA_LOCATION, myLoc);
+                intent.putExtra(GeoMapFragment.INTENT_EXTRA_LOCATION, myLoc);
                 startActivity(intent);
             }
         });
@@ -159,32 +157,6 @@ public class GeoMapFragment extends Fragment {
         }
 
         return v;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            MapView v = (MapView) getView().findViewById(R.id.map);
-            mMap = v.getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
-            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                public void onCameraChange(CameraPosition position) {
-                    // TODO possibly get new markers when moving map?
-                    doMapQuery();
-                }
-            });
-        }
     }
 
     private void setUpMap() {

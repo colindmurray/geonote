@@ -1,13 +1,10 @@
 package info.geopost.geopost;
 
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.location.Location;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -15,11 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.google.android.gms.maps.model.LatLng;
@@ -55,16 +49,16 @@ public class PostActivity extends ActionBarActivity {
         mCharacterCountTextView = (TextView) findViewById(R.id.character_count_textview);
         mPostButton = (ButtonFlat) findViewById(R.id.post_button);
         mPostEditText = (EditText) findViewById(R.id.post_edittext);
-        mTitleEditText = (EditText) findViewById(R.id.title_editText);
+//        mTitleEditText = (EditText) findViewById(R.id.title_editText);
 
-        mTitleEditText.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) {
-//                updatePostButtonState();
-                updateCharacterCountTextViewText();
-            }
-        });
+//        mTitleEditText.addTextChangedListener(new TextWatcher() {
+//            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+//            @Override public void afterTextChanged(Editable s) {
+////                updatePostButtonState();
+//                updateCharacterCountTextViewText();
+//            }
+//        });
 
         mPostEditText.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -96,7 +90,9 @@ public class PostActivity extends ActionBarActivity {
     }
 
     private void updatePostButtonState() {
-        int length = getTitleEditTextText().length();
+//        int length = getTitleEditTextText().length();
+//        boolean enabled = length > 0 && length < MAX_CHARACTER_COUNT;
+        int length = getPostEditTextText().length();
         boolean enabled = length > 0 && length < MAX_CHARACTER_COUNT;
         mPostButton.setEnabled(enabled);
     }
@@ -110,18 +106,18 @@ public class PostActivity extends ActionBarActivity {
         // 1
         GeoPostObj post = new GeoPostObj();
         post.setLocation(mGeoPoint);
-        String title = getTitleEditTextText();
         String text = getPostEditTextText();
         final ProgressDialog dialog = new ProgressDialog(PostActivity.this);
         dialog.setMessage(getString(R.string.progress_post));
         dialog.show();
         post.setText(text);
-        post.setTitle(title);
+        post.setUsername(ParseUser.getCurrentUser().getUsername());
         post.setUser(ParseUser.getCurrentUser());
 
         // 2
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
         post.setACL(acl);
 
         // 3

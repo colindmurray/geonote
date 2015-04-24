@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,10 +87,12 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             }
 
             @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
 
         });
 
@@ -113,6 +116,11 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         switch (item.getItemId()){
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     @Override
@@ -179,7 +187,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                     }
                 }
             }
-            catch(Exception e){}
+            catch(Exception e){
+                Log.e("MainActivity", "Erorr in setting fragment.");}
         }
 
         private void setFragment(Tab tab, Fragment f){
