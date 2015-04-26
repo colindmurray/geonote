@@ -8,12 +8,12 @@
     <string name="title_activity_post">PostActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="post_prompt">Description (optional)</string>
+    <string name="post_prompt">What\'s on your mind citizen?</string>
     <string name="title_prompt">Title (required)</string>
     <string name="post">Post</string>
     <string name="character_count_placeholder">0/140</string>
     <string name="progress_post">Posting&#8230;</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">GeoPost</string>
     <string name="post_out_of_range">Can\'t view post! Get closer.</string>
     <string name="title_activity_dispatch">GeoPost</string>
 
@@ -31,5 +31,10 @@
     <string name="title_activity_modal">ModalActivity</string>
     <string name="post_comment">Poster\'s comment goes in this area!</string>
     <string name="username_temp">\@Xx_username_xX</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">GeoPost Map Fragment in the house!</string>
+    <string name="comments">5</string>
+    <string name="hide">hide</string>
 
 </resources>

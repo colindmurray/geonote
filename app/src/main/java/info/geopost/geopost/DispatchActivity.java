@@ -26,7 +26,7 @@ public class DispatchActivity extends ActionBarActivity {
         if (ParseUser.getCurrentUser() != null){
             String user = ParseUser.getCurrentUser().getUsername();
             Log.e(TAG, "Current user: " + user);
-            startActivity(new Intent(this, MapsActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
         }
         else{
             ParseObject.registerSubclass(GeoPostObj.class);
@@ -39,7 +39,7 @@ public class DispatchActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.e(TAG, String.format("Request code is: %d and result code is: %d", requestCode, resultCode));
         if (resultCode == RESULT_OK){
-            startActivity(new Intent(this, MapsActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
             finish();
         }
         else if (resultCode == RESULT_CANCELED){

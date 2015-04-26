@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -43,6 +42,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.rey.material.widget.Button;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,7 +101,7 @@ public class MapsActivity extends ActionBarActivity
     private boolean zoomToUserLocation = true;
 
     //dialog buttons
-    ButtonFloatSmall mUpvoteButton;
+    com.rey.material.widget.FloatingActionButton mUpvoteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,13 +173,12 @@ public class MapsActivity extends ActionBarActivity
         MaterialDialog m = new MaterialDialog.Builder(this)
                 .customView(R.layout.activity_modal, wrapInScrollView)
                 .show();
-        mUpvoteButton = (ButtonFloatSmall) m.findViewById(R.id.buttonFloatSmall);
+        mUpvoteButton = (com.rey.material.widget.FloatingActionButton) m.findViewById(R.id.upvote_button);
         mUpvoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 mUpvoteButton.setBackgroundColor(getResources().getColor(R.color.green));
-                mUpvoteButton.setDrawableIcon(getResources().getDrawable(R.drawable.up_vote_pressed));
             }
         });
 

@@ -35,6 +35,10 @@ public class GeoPostObj extends ParseObject {
         put("user", value);
     }
 
+    public String getUsername() {return getString("username");}
+
+    public void setUsername(String value) {put ("username", value);}
+
     public ParseGeoPoint getLocation() {
         return getParseGeoPoint("location");
     }

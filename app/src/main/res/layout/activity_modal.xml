@@ -9,7 +9,8 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:materialdesign="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -25,16 +26,18 @@
             android:layout_height="247dp"
             android:layout_gravity="center">
 
-            <CheckBox
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:button="@android:drawable/btn_star"
-                android:layout_above="@+id/textView"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:id="@+id/checkBox"
-                android:checked="false"
-                android:clickable="true" />
+                android:text="@string/username_temp"
+                android:id="@+id/postUserNameTextView"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textColor="@color/primary"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="3dp" />
+
             <View
                 android:id="@+id/separator1"
                 android:layout_width="fill_parent"
@@ -47,21 +50,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/username_temp"
-                android:id="@+id/postUserNameTextView"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:textColor="@color/primary"
-                android:layout_toLeftOf="@+id/checkBox"
-                android:layout_toStartOf="@+id/checkBox" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:text="@string/post_comment"
                 android:id="@+id/textView"
                 android:textColor="@color/primary_text"
-                android:layout_below="@+id/postUserNameTextView" />
+                android:layout_below="@+id/postUserNameTextView"
+                android:layout_marginTop="10dp" />
         </RelativeLayout>
 
         <View
@@ -74,56 +67,92 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/"
-        android:layout_marginTop="8dp">
+        android:id="@+id/actionsWrapper"
+        android:layout_marginTop="12dp">
+
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/hide_button"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:background="@color/secondary_text"
+            android:text="@string/hide"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
 
         <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true">
-                <!--<ImageButton-->
-                    <!--android:id="@+id/buttonflat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:src="@drawable/up_vote"-->
-                    <!--android:background="#00000000"-->
-                    <!--android:layout_alignParentTop="true"-->
-                    <!--android:layout_alignParentLeft="true"-->
-                    <!--android:layout_alignParentStart="true" />-->
-                <!--<ImageButton-->
-                    <!--android:id="@+id/buttonflat2"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:src="@drawable/down_vote"-->
-                    <!--android:background="#00000000"-->
-                    <!--android:layout_marginLeft="19dp"-->
-                    <!--android:layout_marginStart="19dp"-->
-                    <!--android:layout_alignParentTop="true"-->
-                    <!--android:layout_toRightOf="@+id/buttonflat"-->
-                    <!--android:layout_toEndOf="@+id/buttonflat" />-->
+                android:layout_centerInParent="true"
+            android:id="@+id/voteButtonWrapper">
 
-
-            <com.gc.materialdesign.views.ButtonFloatSmall
-                android:id="@+id/buttonFloatSmall"
+            <com.rey.material.widget.FloatingActionButton
+                style="@style/Material.Widget.FloatingActionButton.Light"
+                android:id="@+id/downvote_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                materialdesign:iconDrawable="@drawable/up_vote" />
-
-            <com.gc.materialdesign.views.ButtonFloatSmall
-                android:id="@+id/buttonFloatSmall2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                materialdesign:iconDrawable="@drawable/down_vote_pressed"
-                android:layout_marginLeft="19dp"
-                android:layout_marginStart="19dp"
+                app:fab_iconSrc="@drawable/down_vote"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/buttonFloatSmall"
-                android:layout_toEndOf="@+id/buttonFloatSmall"
-                android:background="#ffff1612" />
-            />
+                android:layout_marginRight="5dp"
+                app:fab_backgroundColor="#ffffff"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:paddingTop="12dp"
+                android:id="@+id/voteRatioTextView"
+                android:textColor="@color/secondary_text"
+                android:layout_toRightOf="@+id/downvote_button"
+                android:layout_toEndOf="@+id/downvote_button"
+                android:textSize="20dp" />
+
+            <com.rey.material.widget.FloatingActionButton
+                style="@style/Material.Widget.FloatingActionButton.Light"
+                android:id="@+id/upvote_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_iconSrc="@drawable/up_vote"
+                app:fab_backgroundColor="#ffffff"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/voteRatioTextView"
+                android:layout_toEndOf="@+id/voteRatioTextView"
+                android:layout_marginLeft="5dp"/>
         </RelativeLayout>
-    </RelativeLayout>
+        <!--<RelativeLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_toRightOf="@+id/voteButtonWrapper"-->
+            <!--android:layout_toEndOf="@+id/voteButtonWrapper">-->
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/click"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/comments"-->
+            <!--android:textSize="55sp"-->
+            <!--android:textColor="@color/primary"-->
+            <!--android:clickable="true"/>-->
+        <!--</RelativeLayout>-->
+        <Button
+            android:id="@+id/comments_button"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="@string/comments"
+            android:textColor="@color/primary"
+            android:drawableLeft="@drawable/comment"
+            android:drawableStart="@drawable/comment"
+            android:drawablePadding="5dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textSize="17sp"
+            android:layout_alignTop="@+id/post_button"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+</RelativeLayout>
 
 </LinearLayout>
 <!--</FrameLayout>-->
