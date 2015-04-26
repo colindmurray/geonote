@@ -119,6 +119,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     @Override
     public void onBackPressed() {
+        setResult(RESULT_CANCELED);
         finish();
     }
 

@@ -13,4 +13,5 @@
     <dimen name="navdrawer_image_height">145dp</dimen>
 
     <dimen name="headerbar_elevation">2dp</dimen>
+    <dimen name="card_base_empty_height">150dp</dimen>
 </resources>
