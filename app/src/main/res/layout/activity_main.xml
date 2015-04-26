@@ -33,7 +33,7 @@
                 android:background="?attr/colorPrimary"
                 android:fillViewport="false" />
 
-            <com.rey.material.demo.CustomViewPager
+            <info.geopost.geopost.CustomViewPager
                 android:id="@+id/main_vp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

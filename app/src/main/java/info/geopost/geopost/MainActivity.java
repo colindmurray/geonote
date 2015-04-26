@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.rey.material.app.ToolbarManager;
-import com.rey.material.demo.CustomViewPager;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.TabPageIndicator;
 

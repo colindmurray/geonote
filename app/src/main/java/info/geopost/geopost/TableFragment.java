@@ -7,6 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.internal.CardHeader;
+import it.gmariotti.cardslib.library.view.CardListView;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,12 +67,22 @@ public class TableFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_table, container, false);
-//        Card card = new Card(getActivity());
-//        CardHeader header = new CardHeader(container.getContext());
-//        card.addCardHeader(header);
-//
-//        CardViewNative cardView = (CardViewNative) getActivity().findViewById(R.id.carddemo);
-//        cardView.setCard(card);
+        ArrayList<Card> cards = new ArrayList<>();
+        for (int i = 0; i < 10; i++){
+            GeoCard card = new GeoCard(getActivity().getApplicationContext());
+//            Card card = new Card(getActivity().getApplicationContext());
+            card.setupInnerViewElements(container, view);
+            CardHeader header = new CardHeader(getActivity().getApplicationContext());
+            header.setTitle("Whee it's a header.");
+            card.addCardHeader(header);
+            cards.add(card);
+        }
+        CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(getActivity().getApplicationContext(),cards);
+
+        CardListView listView = (CardListView) view.findViewById(R.id.myList);
+        if (listView!=null){
+            listView.setAdapter(mCardArrayAdapter);
+        }
         return view;
 
     }

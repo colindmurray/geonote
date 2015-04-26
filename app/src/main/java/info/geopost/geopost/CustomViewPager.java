@@ -1,4 +1,4 @@
-package com.rey.material.demo;
+package info.geopost.geopost;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
