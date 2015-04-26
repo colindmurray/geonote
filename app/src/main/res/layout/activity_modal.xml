@@ -1,0 +1,158 @@
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"-->
+    <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
+    <!--android:paddingTop="@dimen/activity_vertical_margin"-->
+    <!--android:paddingBottom="@dimen/activity_vertical_margin"-->
+    <!--tools:context="info.geopost.geopost.ModalActivity"-->
+    <!--android:id="@+id/frameLayout">-->
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:materialdesign="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:id="@+id/modalLayout">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="247dp"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/username_temp"
+                android:id="@+id/postUserNameTextView"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textColor="@color/primary"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="3dp" />
+
+            <View
+                android:id="@+id/separator1"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_above="@+id/textView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/post_comment"
+                android:id="@+id/textView"
+                android:textColor="@color/primary_text"
+                android:layout_below="@+id/postUserNameTextView"
+                android:layout_marginTop="10dp" />
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/separator2"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/actionsWrapper"
+        android:layout_marginTop="12dp">
+
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/hide_button"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:background="@color/secondary_text"
+            android:text="@string/hide"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+        <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+            android:id="@+id/voteButtonWrapper">
+
+            <com.rey.material.widget.FloatingActionButton
+                style="@style/Material.Widget.FloatingActionButton.Light"
+                android:id="@+id/downvote_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_iconSrc="@drawable/down_vote"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="5dp"
+                app:fab_backgroundColor="#ffffff"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:paddingTop="12dp"
+                android:id="@+id/voteRatioTextView"
+                android:textColor="@color/secondary_text"
+                android:layout_toRightOf="@+id/downvote_button"
+                android:layout_toEndOf="@+id/downvote_button"
+                android:textSize="20dp" />
+
+            <com.rey.material.widget.FloatingActionButton
+                style="@style/Material.Widget.FloatingActionButton.Light"
+                android:id="@+id/upvote_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_iconSrc="@drawable/up_vote"
+                app:fab_backgroundColor="#ffffff"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/voteRatioTextView"
+                android:layout_toEndOf="@+id/voteRatioTextView"
+                android:layout_marginLeft="5dp"/>
+        </RelativeLayout>
+        <!--<RelativeLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_toRightOf="@+id/voteButtonWrapper"-->
+            <!--android:layout_toEndOf="@+id/voteButtonWrapper">-->
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/click"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/comments"-->
+            <!--android:textSize="55sp"-->
+            <!--android:textColor="@color/primary"-->
+            <!--android:clickable="true"/>-->
+        <!--</RelativeLayout>-->
+        <Button
+            android:id="@+id/comments_button"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="@string/comments"
+            android:textColor="@color/primary"
+            android:drawableLeft="@drawable/comment"
+            android:drawableStart="@drawable/comment"
+            android:drawablePadding="5dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textSize="17sp"
+            android:layout_alignTop="@+id/post_button"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+</RelativeLayout>
+
+</LinearLayout>
+<!--</FrameLayout>-->

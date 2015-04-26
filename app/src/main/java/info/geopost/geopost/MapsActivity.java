@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,11 +18,14 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.gc.materialdesign.views.ButtonFloatSmall;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +42,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.rey.material.widget.Button;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +68,7 @@ public class MapsActivity extends ActionBarActivity
 
     // Conversion from kilometers to meters
     private static final int METERS_PER_KILOMETER = 1000;
-    private static final float DEFAULT_SEARCH_DISTANCE = 250.0f;
+    private static final float DEFAULT_SEARCH_DISTANCE = METERS_PER_KILOMETER * 11;
     private static final long PARSE_QUERY_TIMEOUT = 30000;
 
     private GoogleMap mMap;
@@ -94,6 +99,9 @@ public class MapsActivity extends ActionBarActivity
 
     // Set map to current user location on first location event.
     private boolean zoomToUserLocation = true;
+
+    //dialog buttons
+    com.rey.material.widget.FloatingActionButton mUpvoteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +167,20 @@ public class MapsActivity extends ActionBarActivity
         }
 
         setUpMapIfNeeded();
+
+//        Testing modal
+        boolean wrapInScrollView = true;
+        MaterialDialog m = new MaterialDialog.Builder(this)
+                .customView(R.layout.activity_modal, wrapInScrollView)
+                .show();
+        mUpvoteButton = (com.rey.material.widget.FloatingActionButton) m.findViewById(R.id.upvote_button);
+        mUpvoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mUpvoteButton.setBackgroundColor(getResources().getColor(R.color.green));
+            }
+        });
 
     }
 
@@ -322,10 +344,6 @@ public class MapsActivity extends ActionBarActivity
         mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
             @Override
             public void done(List<GeoPostObj> objects, ParseException e) {
-                // Check for errors
-
-                // No errors, process query results
-                // 1
                 geoPostObjList = objects;
                 mLastParseQueryTime = System.currentTimeMillis();
                 mLastParseQueryLocation = mCurrentLocation;

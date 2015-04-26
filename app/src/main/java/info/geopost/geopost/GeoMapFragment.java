@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,7 +44,7 @@ import java.util.Set;
  * Use the {@link GeoMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GeoMapFragment extends Fragment {
+public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
@@ -83,6 +84,7 @@ public class GeoMapFragment extends Fragment {
 
     // Set map to current user location on first location event.
     private boolean zoomToUserLocation = true;
+    private com.rey.material.widget.FloatingActionButton mUpvoteButton;
 
     /**
      * Use this factory method to create a new instance of
@@ -95,11 +97,13 @@ public class GeoMapFragment extends Fragment {
         GeoMapFragment fragment = new GeoMapFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
+
         return fragment;
     }
 
     public GeoMapFragment() {
         // Required empty public constructor
+
     }
 
     @Override
@@ -107,7 +111,6 @@ public class GeoMapFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
-
 //        setUpMapIfNeeded();
     }
 
@@ -155,12 +158,13 @@ public class GeoMapFragment extends Fragment {
                     " lastLat: " + mLastLocation.latitude +
                     " lastLon: " + mLastLocation.longitude);
         }
-
+        setUpMap();
         return v;
     }
 
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
+        mMap.setOnMarkerClickListener(this);
         mMap.setOnMyLocationChangeListener(myLocationChangeListener);
         // Move map camera to saved location if one exists.
         if(mCurrentLocation.latitude != 0.0 && mCurrentLocation.longitude != 0.0) {
@@ -358,6 +362,25 @@ public class GeoMapFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+
+        //        Testing modal
+        boolean wrapInScrollView = true;
+        MaterialDialog m = new MaterialDialog.Builder(getActivity())
+                .customView(R.layout.activity_modal, wrapInScrollView)
+                .show();
+        mUpvoteButton = (com.rey.material.widget.FloatingActionButton) m.findViewById(R.id.upvote_button);
+        mUpvoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                mUpvoteButton.setBackgroundColor(getResources().getColor(R.color.green));
+            }
+        });
+        return true;
     }
 
 }
