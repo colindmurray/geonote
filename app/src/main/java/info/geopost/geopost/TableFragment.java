@@ -13,6 +13,7 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.view.CardListView;
+import it.gmariotti.cardslib.library.view.CardViewNative;
 
 
 /**
@@ -23,7 +24,7 @@ import it.gmariotti.cardslib.library.view.CardListView;
  * Use the {@link TableFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TableFragment extends Fragment {
+public class  TableFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -69,12 +70,14 @@ public class TableFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_table, container, false);
         ArrayList<Card> cards = new ArrayList<>();
         for (int i = 0; i < 10; i++){
-            GeoCard card = new GeoCard(getActivity().getApplicationContext());
+            GeoCard card = new GeoCard(getActivity());
 //            Card card = new Card(getActivity().getApplicationContext());
-            card.setupInnerViewElements(container, view);
-            CardHeader header = new CardHeader(getActivity().getApplicationContext());
-            header.setTitle("Whee it's a header.");
-            card.addCardHeader(header);
+//            card.setupInnerViewElements(container, view);
+//            CardViewNative cardView = (CardViewNative) getActivity().findViewById(R.id.card_main_layout);
+//            cardView.setCard(card);
+//                    CardHeader header = new CardHeader(getActivity());
+//            header.setTitle("Whee it's a header.");
+//            card.addCardHeader(header);
             cards.add(card);
         }
         CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(getActivity().getApplicationContext(),cards);

@@ -13,11 +13,11 @@
         <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-        <com.google.android.gms.maps.MapView
-             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/map"
-            class="com.google.android.gms.maps.SupportMapFragment"/>
+            <com.google.android.gms.maps.MapView
+                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/map"
+                class="com.google.android.gms.maps.SupportMapFragment"/>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/map_post_button"

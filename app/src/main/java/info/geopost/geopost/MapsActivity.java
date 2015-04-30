@@ -286,12 +286,7 @@ public class MapsActivity extends ActionBarActivity
             if (mMap != null) {
                 setUpMap();
             }
-            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                public void onCameraChange(CameraPosition position) {
-                    // TODO possibly get new markers when moving map?
-                    //doMapQuery();
-                }
-            });
+
         }
     }
 
@@ -313,6 +308,12 @@ public class MapsActivity extends ActionBarActivity
                     " curLon: " + mCurrentLocation.longitude);
         }
         geoList = new ListViewForGeoPost();
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            public void onCameraChange(CameraPosition position) {
+                // TODO possibly get new markers when moving map?
+                //doMapQuery();
+            }
+        });
     }
 
     @Override

@@ -16,8 +16,7 @@ public class GeoCard extends Card
     protected TextView mTitle;
 
     public GeoCard(Context context) {
-        super(context);
-        initialize();
+        this(context, R.layout.card_layout);
     }
 
     public GeoCard(Context context, int innerLayout) {
@@ -38,5 +37,9 @@ public class GeoCard extends Card
     public void setupInnerViewElements(ViewGroup parent, View view) {
 //        mTitle = (TextView) parent.findViewById(R.id.card_main_inner_simple_title);
 //        mTitle.setText("GeoPost y'all!");
+        int i = 1;
+        mTitle = (TextView) parent.findViewById(R.id.textView);
+
+        mTitle.setText("hello!");
     }
 }
