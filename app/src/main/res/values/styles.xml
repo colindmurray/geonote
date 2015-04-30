@@ -50,7 +50,7 @@
         <item name="tpi_tabRipple">@style/TabRippleStyle</item>
         <item name="tpi_indicatorHeight">3dp</item>
         <item name="android:textAppearance">@style/TabTextAppearance</item>
-        <item name="tpi_mode">scroll</item>
+        <item name="tpi_mode">fixed</item>
     </style>
 
     <style name="TabTextAppearance" parent="@style/Base.TextAppearance.AppCompat.Subhead">
