@@ -12,9 +12,7 @@ import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
-import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.view.CardListView;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 
 
 /**
@@ -72,13 +70,6 @@ public class  TableFragment extends Fragment {
         ArrayList<Card> cards = new ArrayList<>();
         for (int i = 0; i < 10; i++){
             GeoCard card = new GeoCard(getActivity());
-//            Card card = new Card(getActivity().getApplicationContext());
-//            card.setupInnerViewElements(container, view);
-//            CardViewNative cardView = (CardViewNative) getActivity().findViewById(R.id.card_main_layout);
-//            cardView.setCard(card);
-//                    CardHeader header = new CardHeader(getActivity());
-//            header.setTitle("Whee it's a header.");
-//            card.addCardHeader(header);
             cards.add(card);
         }
         CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(getActivity().getApplicationContext(),cards);

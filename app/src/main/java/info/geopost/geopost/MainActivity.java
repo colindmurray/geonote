@@ -1,5 +1,6 @@
 package info.geopost.geopost;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,9 +13,15 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
@@ -22,6 +29,11 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+=======
+import com.parse.LogOutCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+>>>>>>> ceaff7748adb0d2568936583cb0665c3bbabe3ee
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.TabPageIndicator;
@@ -71,6 +83,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     private ToolbarManager mToolbarManager;
     private SnackBar mSnackBar;
     private Tab[] mItems = new Tab[]{Tab.MAPS, Tab.TABLE};
+    private final String TAG = "MainActivity";
+    private long geopoints = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +123,33 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
         });
         mToolbarManager.registerOnToolbarGroupChangedListener(this);
+
+        String [] navNames = new String[3];
+        navNames[0] = ParseUser.getCurrentUser().getUsername();
+        navNames[1] = "GeoPoints: " + geopoints;
+        navNames[2] = "Logout";
+        lv_drawer.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, navNames));
+        lv_drawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e(TAG, "Navigation item at position: " + position +" with id: " + id);
+                Toast.makeText(getBaseContext(), "Example action.", Toast.LENGTH_SHORT).show();
+                //Switch on position here.
+                switch(position){
+                    case 0:
+                        TextView tv = (TextView) view;
+                        tv.setText("Username: " + ParseUser.getCurrentUser().getUsername());
+                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        logoutParseUser();
+                        break;
+                }
+            }
+        });
+
 
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), mItems);
         vp.setAdapter(mPagerAdapter);
@@ -151,6 +192,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.e(TAG, "In IteamSelected");
         switch (item.getItemId()){
         }
         return true;
@@ -167,9 +209,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         mToolbarManager.notifyNavigationStateChanged();
     }
 
-    public SnackBar getSnackBar(){
-        return mSnackBar;
-    }
+
 
     @Override
     public List<GeoPostObj> getGeopostObjects() {
@@ -229,6 +269,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         return new LatLng(point.getLatitude(), point.getLongitude());
     }
 
+
     public enum Tab {
         MAPS("Maps"),
         TABLE("Table");
@@ -253,9 +294,9 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         Fragment[] mFragments;
         Tab[] mTabs;
 
-        private static final Field sActiveField;
+        private final Field sActiveField;
 
-        static {
+         {
             Field f = null;
             try {
                 Class<?> c = Class.forName("android.support.v4.app.FragmentManagerImpl");
@@ -322,5 +363,18 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         public int getCount() {
             return mFragments.length;
         }
+    }
+
+    private void logoutParseUser(){
+        ParseUser.logOutInBackground(new LogOutCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null){
+                    Toast.makeText(getApplicationContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this , DispatchActivity.class));
+                    finish();
+                } //TODO Add error checking.
+            }
+        });
     }
 }
