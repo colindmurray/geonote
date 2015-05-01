@@ -14,9 +14,11 @@ import it.gmariotti.cardslib.library.internal.Card;
 public class GeoCard extends Card
 {
     protected TextView mTitle;
+    GeoPostObj mGeoPostObj;
 
-    public GeoCard(Context context) {
+    public GeoCard(Context context, GeoPostObj mGeoPostObj) {
         this(context, R.layout.card_layout);
+        this.mGeoPostObj = mGeoPostObj;
     }
 
     public GeoCard(Context context, int innerLayout) {
@@ -35,11 +37,8 @@ public class GeoCard extends Card
 
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view) {
-//        mTitle = (TextView) parent.findViewById(R.id.card_main_inner_simple_title);
-//        mTitle.setText("GeoPost y'all!");
-        int i = 1;
         mTitle = (TextView) parent.findViewById(R.id.textView);
 
-        mTitle.setText("hello!");
+        mTitle.setText(mGeoPostObj.getText());
     }
 }

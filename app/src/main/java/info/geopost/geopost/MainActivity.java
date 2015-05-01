@@ -66,7 +66,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     private FloatingActionButton mPostButton;
 
     private FragmentInteractionInterface mMapFragmentListener;
-
+    private FragmentInteractionInterface mTableFragmentListerner;
 
     private DrawerLayout dl_navigator;
     private FrameLayout fl_drawer;
@@ -250,7 +250,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                     Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
 
                 mMapFragmentListener.updateGeopostObjects(geoPostObjList);
-
+                mTableFragmentListerner.updateGeopostObjects(geoPostObjList);
             }
         });
     }
@@ -369,6 +369,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                         break;
                     case TABLE:
                         mFragments[position] = TableFragment.newInstance();
+                        mTableFragmentListerner = (FragmentInteractionInterface) mFragments[position];
                         break;
                 }
             }
