@@ -46,8 +46,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
     private static final int MAX_POST_SEARCH_RESULTS = 75;
     private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
+
     // Conversion from kilometers to meters
-    private static final int METERS_PER_KILOMETER = 1000;
     private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
     private static final long PARSE_QUERY_TIMEOUT = 30000;
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
@@ -217,24 +217,14 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     @Override
     public void doParseQuery() {
-        // 1
         LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-//        if (myLoc == null) {
-//            cleanUpMarkers(new HashSet<String>());
-//            return;
-//        }
-        // 2
         Log.d(TAG, "doMapQuery called.");
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-        // 3
         ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
-        // 4
         mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
-        // 5
         mapQuery.include("user");
         mapQuery.orderByDescending("createdAt");
         mapQuery.setLimit(MAX_POST_SEARCH_RESULTS);
-        // 6
         mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
             @Override
             public void done(List<GeoPostObj> objects, ParseException e) {
