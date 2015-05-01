@@ -95,7 +95,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.e(TAG, "Navigation item at position: " + position +" with id: " + id);
-                Toast.makeText(getBaseContext(), "Example action.", Toast.LENGTH_SHORT).show();
                 //Switch on position here.
                 switch(position){
                     case 0:
@@ -104,6 +103,9 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                         Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
+                        TextView tv2 = (TextView) view;
+                        tv2.setText("Test: " + ParseUser.getCurrentUser().getUsername());
+                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
                         logoutParseUser();
