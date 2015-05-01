@@ -19,6 +19,14 @@ public class GeoPostObj extends ParseObject {
         put("text", value);
     }
 
+    public int getVotes() {
+        return getInt("votes");
+    }
+
+    public void setVotes(int value) {
+        put("votes", value);
+    }
+
     public String getTitle(){
         return getString("title");
     }

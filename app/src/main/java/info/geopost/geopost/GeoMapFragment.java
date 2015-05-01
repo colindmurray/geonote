@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,25 +49,32 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private GoogleMap mMap;
     private static final String TAG = GeoMapFragment.class.getSimpleName();
     private FloatingActionButton mPostButton;
+    // Dialog attributes
+    private MaterialDialog mMaterialDialog;
+    private com.rey.material.widget.FloatingActionButton mDownVoteButton;
+    private com.rey.material.widget.FloatingActionButton mUpvoteButton;
+    private TextView mModalUserName;
+    private TextView mModalVoteRatio;
+    private TextView mModalTextBody;
+
+    private GeoPostMarker mSelectedGeoPostMarker;
+    private Handler mDelayHandler = new Handler();
+
+    private Runnable mDelayShowDialog;
+    // Current Location
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
+
     private LatLng mLastLocation = new LatLng(0.0, 0.0);
+
     //    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
     private HashMap<Marker, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
 
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
-
-    private CharSequence mTitle;
-
     // Access basic application info
     private SharedPreferences mPrefs;
-
     // Set map to current user location on first location event.
-    private boolean zoomToUserLocation = true;
-    private com.rey.material.widget.FloatingActionButton mUpvoteButton;
     private MainActivityInteractionInterface mMainActivity;
-    private TextView mModalUserName;
-    private TextView mModalTextBody;
 
     /**
      * Use this factory method to create a new instance of
@@ -91,9 +99,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
-//        setUpMapIfNeeded();
     }
 
     @Override
@@ -112,12 +118,36 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_map, container, false);
+
+        mMaterialDialog = new MaterialDialog.Builder(getActivity())
+                .customView(R.layout.activity_modal, true).build();
+        mModalUserName = (TextView) mMaterialDialog.findViewById(R.id.postUserNameTextView);
+        mModalTextBody = (TextView) mMaterialDialog.findViewById(R.id.postTextBody);
+        mModalVoteRatio = (TextView) mMaterialDialog.findViewById(R.id.voteRatioTextView);
+        mUpvoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.upvote_button);
+        mUpvoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Upvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
+                int votes = mSelectedGeoPostMarker.geoPostObj.getVotes() + 1;
+                mModalVoteRatio.setText("" + votes);
+                mSelectedGeoPostMarker.geoPostObj.setVotes(votes);
+            }
+        });
+        mDownVoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.downvote_button);
+        mDownVoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Downvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
+                int votes = mSelectedGeoPostMarker.geoPostObj.getVotes() - 1;
+                mModalVoteRatio.setText("" + votes);
+                mSelectedGeoPostMarker.geoPostObj.setVotes(votes);
+            }
+        });
         mPostButton = (FloatingActionButton) v.findViewById(R.id.map_post_button);
         mPostButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // 2
                 LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-                // 3
                 Intent intent = new Intent(getActivity(), PostActivity.class);
                 intent.putExtra(GeoMapFragment.INTENT_EXTRA_LOCATION, myLoc);
                 startActivity(intent);
@@ -194,8 +224,8 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
             // disable markers now out of range, enable markers in range.
             recalculateUserMarkerDistances();
-            // Perform mapQuery if current vs last location within certain distance interval.
 
+            // Perform mapQuery if current vs last location within certain distance interval.
             mMainActivity.doParseQueryIfLargeLocationChangeOrTimeout();
         }
     };
@@ -270,7 +300,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     @Override
     public void updateGeopostObjects(List<GeoPostObj> geoPostObjList) {
-        Log.d(TAG, "HERE!!!!");
+        Log.d(TAG, "Updating GeoPost markers");
         Set<String> toKeep = new HashSet<>();
         for (GeoPostObj post : geoPostObjList) {
 
@@ -301,12 +331,14 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     @Override
     public void onStop() {
         super.onStop();
+        mDelayHandler.removeCallbacks(mDelayShowDialog);
         mMap.setMyLocationEnabled(false);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mDelayHandler.removeCallbacks(mDelayShowDialog);
         mMap.setMyLocationEnabled(false);
     }
 
@@ -318,28 +350,28 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        GeoPostMarker postMarker = mGeoPostMarkers.get(marker);
+        mSelectedGeoPostMarker = mGeoPostMarkers.get(marker);
         if(mGeoPostMarkers.containsKey(marker)) {
             Log.d(TAG, "GeoPostMarker Text: " + mGeoPostMarkers.get(marker).geoPostObj.getText());
         }
+        float zoom = mMap.getCameraPosition().zoom;
+        CameraPosition pos = new CameraPosition(marker.getPosition(), zoom, 0f, 0f);
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
+        mModalUserName.setText(mSelectedGeoPostMarker.geoPostObj.getUser().getUsername());
+        mModalTextBody.setText(mSelectedGeoPostMarker.geoPostObj.getText());
+        mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+        // Give camera time to move to new location.  Doing this while loading the dialog ended up being
+        // really slow and choppy
+        mDelayShowDialog = new Runnable() {
 
-        //        Testing modal
-        boolean wrapInScrollView = true;
-        MaterialDialog m = new MaterialDialog.Builder(getActivity())
-                .customView(R.layout.activity_modal, wrapInScrollView)
-                .show();
-        mModalUserName = (TextView) m.findViewById(R.id.postUserNameTextView);
-        mModalUserName.setText(postMarker.geoPostObj.getUser().getUsername());
-        mModalTextBody = (TextView) m.findViewById(R.id.postTextBody);
-        mModalTextBody.setText(postMarker.geoPostObj.getText());
-        mUpvoteButton = (com.rey.material.widget.FloatingActionButton) m.findViewById(R.id.upvote_button);
-        mUpvoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-//                mUpvoteButton.setBackgroundColor(getResources().getColor(R.color.green));
+            public void run() {
+                mMaterialDialog.show();
             }
-        });
+
+        };
+        mDelayHandler.postDelayed(mDelayShowDialog, 1000);
+
         return true;
     }
 
