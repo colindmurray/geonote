@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
@@ -107,9 +108,9 @@ public class  TableFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnMapFragmentInteraction {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void updateGeopostObjects(List<GeoPostObj> geoPostObjList);
     }
 
 }

@@ -44,12 +44,12 @@ import java.util.Set;
  * Use the {@link GeoMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
+public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapFragmentInteraction {
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
-    private static final int MAX_POST_SEARCH_DISTANCE = 100;
-    private static final int MAX_POST_SEARCH_RESULTS = 75;
+//    private static final int MAX_POST_SEARCH_DISTANCE = 100;
+//    private static final int MAX_POST_SEARCH_RESULTS = 75;
     private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
     private static final String PREF_CURRENT_LAT = "mCurrentLat";
     private static final String PREF_CURRENT_LON = "mCurrentLon";
@@ -68,9 +68,9 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private LatLng mLastLocation = new LatLng(0.0, 0.0);
     //    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
     private HashMap<String, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
-    private String mSelectedPostObjectId;
-    private long mLastParseQueryTime;
-    private LatLng mLastParseQueryLocation;
+//    private String mSelectedPostObjectId;
+//    private long mLastParseQueryTime;
+//    private LatLng mLastParseQueryLocation;
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
 
@@ -109,7 +109,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupParse();
+//        setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
 //        setUpMapIfNeeded();
     }
@@ -139,7 +139,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
                 // TODO possibly get new markers when moving map?
-                doMapQuery();
+//                doMapQuery();
             }
         });
 
@@ -176,68 +176,66 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         }
     }
 
-    private void setupParse() {
-        ParseObject.registerSubclass(GeoPostObj.class);
-    }
 
-    private void doMapQuery() {
-        // 1
-        LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-        if (myLoc == null) {
-            cleanUpMarkers(new HashSet<String>());
-            return;
-        }
-        // 2
-        Log.d(TAG, "doMapQuery called.");
-        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-        // 3
-        ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
-        // 4
-        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
-        // 5
-        mapQuery.include("user");
-        mapQuery.orderByDescending("createdAt");
-        mapQuery.setLimit(MAX_POST_SEARCH_RESULTS);
-        // 6
-        mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
-            @Override
-            public void done(List<GeoPostObj> objects, ParseException e) {
-                // Check for errors
 
-                // No errors, process query results
-                // 1
-                geoPostObjList = objects;
-                mLastParseQueryTime = System.currentTimeMillis();
-                mLastParseQueryLocation = mCurrentLocation;
-                Set<String> toKeep = new HashSet<>();
-                if (objects != null)
-                    Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
-                for (GeoPostObj post : objects) {
+//    private void doMapQuery() {
+//        // 1
+//        LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+//        if (myLoc == null) {
+//            cleanUpMarkers(new HashSet<String>());
+//            return;
+//        }
+//        // 2
+//        Log.d(TAG, "doMapQuery called.");
+//        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+//        // 3
+//        ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
+//        // 4
+//        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
+//        // 5
+//        mapQuery.include("user");
+//        mapQuery.orderByDescending("createdAt");
+//        mapQuery.setLimit(MAX_POST_SEARCH_RESULTS);
+//        // 6
+//        mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
+//            @Override
+//            public void done(List<GeoPostObj> objects, ParseException e) {
+//                // Check for errors
+//
+//                // No errors, process query results
+//                // 1
+//                geoPostObjList = objects;
+//                mLastParseQueryTime = System.currentTimeMillis();
+//                mLastParseQueryLocation = mCurrentLocation;
+//                Set<String> toKeep = new HashSet<>();
+//                if (objects != null)
+//                    Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
+//                for (GeoPostObj post : objects) {
+//
+//                    toKeep.add(post.getObjectId());
+//                    GeoPostMarker oldMarker = mGeoPostMarkers.get(post.getObjectId());
+//                    LatLng loc = latLngFromParseGeoPoint(post.getLocation());
+//
+//                    if(oldMarker == null) {
+//                        GeoPostMarker newMarker;
+//                        if(getDistanceInMeters(loc, mCurrentLocation) <= mRadius) {
+//                            newMarker = new GeoPostMarker(post, newEnabledMarker(post),  true);
+//                        } else {
+//                            newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
+//                        }
+//                        mGeoPostMarkers.put(post.getObjectId(), newMarker);
+//                    }
+//                }
+//
+//                // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
+//                cleanUpMarkers(toKeep);
+//            }
+//        });
+//    }
 
-                    toKeep.add(post.getObjectId());
-                    GeoPostMarker oldMarker = mGeoPostMarkers.get(post.getObjectId());
-                    LatLng loc = latLngFromParseGeoPoint(post.getLocation());
-
-                    if(oldMarker == null) {
-                        GeoPostMarker newMarker;
-                        if(getDistanceInMeters(loc, mCurrentLocation) <= mRadius) {
-                            newMarker = new GeoPostMarker(post, newEnabledMarker(post),  true);
-                        } else {
-                            newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
-                        }
-                        mGeoPostMarkers.put(post.getObjectId(), newMarker);
-                    }
-                }
-
-                // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
-                cleanUpMarkers(toKeep);
-            }
-        });
-    }
-
-    private ParseGeoPoint geoPointFromLocation(LatLng loc) {
-        return new ParseGeoPoint(loc.latitude, loc.longitude);
-    }
+//    private ParseGeoPoint geoPointFromLocation(LatLng loc) {
+//        return new ParseGeoPoint(loc.latitude, loc.longitude);
+//    }
 
     private LatLng latLngFromParseGeoPoint(ParseGeoPoint point) {
         return new LatLng(point.getLatitude(), point.getLongitude());
@@ -271,6 +269,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
             // disable markers now out of range, enable markers in range.
             recalculateUserMarkerDistances();
             // Perform mapQuery if current vs last location within certain distance interval.
+
             if(mLastParseQueryLocation != null) {
                 ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
                 ParseGeoPoint curLoc = new ParseGeoPoint(mCurrentLocation.latitude, mCurrentLocation.longitude);
@@ -347,6 +346,31 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                 loc2.longitude,
                 results);
         return results[0];
+    }
+
+    @Override
+    public void updateGeopostObjects(List<GeoPostObj> geoPostObjList) {
+        Log.d(TAG, "HERE!!!!");
+        Set<String> toKeep = new HashSet<>();
+        for (GeoPostObj post : geoPostObjList) {
+
+            toKeep.add(post.getObjectId());
+            GeoPostMarker oldMarker = mGeoPostMarkers.get(post.getObjectId());
+            LatLng loc = latLngFromParseGeoPoint(post.getLocation());
+
+            if(oldMarker == null) {
+                GeoPostMarker newMarker;
+                if(getDistanceInMeters(loc, mCurrentLocation) <= mRadius) {
+                    newMarker = new GeoPostMarker(post, newEnabledMarker(post),  true);
+                } else {
+                    newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
+                }
+                mGeoPostMarkers.put(post.getObjectId(), newMarker);
+            }
+        }
+
+        // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
+        cleanUpMarkers(toKeep);
     }
 
     /**

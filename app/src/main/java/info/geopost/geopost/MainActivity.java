@@ -15,15 +15,49 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.maps.model.LatLng;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.TabPageIndicator;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements ToolbarManager.OnToolbarGroupChangedListener{
+public class MainActivity extends ActionBarActivity implements ToolbarManager.OnToolbarGroupChangedListener, MainActivityInteractionInterface {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static final int MAX_POST_SEARCH_DISTANCE = 100;
+    private static final int MAX_POST_SEARCH_RESULTS = 75;
+    // Conversion from kilometers to meters
+    private static final int METERS_PER_KILOMETER = 1000;
+    private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
+    private static final long PARSE_QUERY_TIMEOUT = 30000;
+    private float mRadius = DEFAULT_SEARCH_DISTANCE;
+
+    //List populated from parse query
+    private List<GeoPostObj> geoPostObjList;
+
+    // Parse query statistics
+    private long mLastParseQueryTime;
+    private LatLng mLastParseQueryLocation;
+
+    //Get location
+    private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
+    private LatLng mLastLocation = new LatLng(0.0, 0.0);
+
+    private FloatingActionButton mPostButton;
+
+    private OnMapFragmentInteraction mMapFragmentListener;
+
 
     private DrawerLayout dl_navigator;
     private FrameLayout fl_drawer;
@@ -44,6 +78,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setupParse();
         fl_drawer = (FrameLayout)findViewById(R.id.main_fl_drawer);
         lv_drawer = (ListView)findViewById(R.id.main_lv_drawer);
         mToolbar = (Toolbar)findViewById(R.id.main_toolbar);
@@ -97,6 +132,10 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     }
 
+    private void setupParse() {
+        ParseObject.registerSubclass(GeoPostObj.class);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -132,6 +171,64 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         return mSnackBar;
     }
 
+    @Override
+    public List<GeoPostObj> getGeopostObjects() {
+        return null;
+    }
+
+    @Override
+    public void doParseQuery() {
+        // 1
+        LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+//        if (myLoc == null) {
+//            cleanUpMarkers(new HashSet<String>());
+//            return;
+//        }
+        // 2
+        Log.d(TAG, "doMapQuery called.");
+        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+        // 3
+        ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
+        // 4
+        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
+        // 5
+        mapQuery.include("user");
+        mapQuery.orderByDescending("createdAt");
+        mapQuery.setLimit(MAX_POST_SEARCH_RESULTS);
+        // 6
+        mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
+            @Override
+            public void done(List<GeoPostObj> objects, ParseException e) {
+                // Check for errors
+
+                // No errors, process query results
+                // 1
+                geoPostObjList = objects;
+                mLastParseQueryTime = System.currentTimeMillis();
+                mLastParseQueryLocation = mCurrentLocation;
+
+                if (objects != null)
+                    Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
+
+                mMapFragmentListener.updateGeopostObjects(geoPostObjList);
+
+            }
+        });
+    }
+
+    @Override
+    public LatLng getCurrentLocation() {
+        return mCurrentLocation;
+    }
+
+    private ParseGeoPoint geoPointFromLocation(LatLng loc) {
+        return new ParseGeoPoint(loc.latitude, loc.longitude);
+    }
+
+    private LatLng latLngFromParseGeoPoint(ParseGeoPoint point) {
+        return new LatLng(point.getLatitude(), point.getLongitude());
+    }
+
     public enum Tab {
         MAPS("Maps"),
         TABLE("Table");
@@ -151,7 +248,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     }
 
-    private static class PagerAdapter extends FragmentStatePagerAdapter {
+    private class PagerAdapter extends FragmentStatePagerAdapter {
 
         Fragment[] mFragments;
         Tab[] mTabs;
@@ -205,6 +302,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                 switch (mTabs[position]) {
                     case MAPS:
                         mFragments[position] = GeoMapFragment.newInstance();
+                        mMapFragmentListener = (OnMapFragmentInteraction) mFragments[position];
                         break;
                     case TABLE:
                         mFragments[position] = TableFragment.newInstance();
