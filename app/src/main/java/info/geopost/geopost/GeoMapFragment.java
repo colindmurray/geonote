@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -33,15 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link GeoMapFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link GeoMapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener, FragmentInteractionInterface {
 
     // Used to pass location from MainActivity to PostActivity
@@ -308,19 +298,22 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         mCurrentLocation = currentLocation;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+    @Override
+    public void onStop() {
+        super.onStop();
+        mMap.setMyLocationEnabled(false);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMap.setMyLocationEnabled(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMap.setMyLocationEnabled(true);
     }
 
     @Override

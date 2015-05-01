@@ -16,6 +16,7 @@
     <string name="title_activity_main">GeoPost</string>
     <string name="post_out_of_range">Can\'t view post! Get closer.</string>
     <string name="title_activity_dispatch">GeoPost</string>
+    <string name="parse_forgot_password">Forgot Password?</string>
 
     <string name="title_section1">Not Logout</string>
     <string name="title_section2">Logout</string>

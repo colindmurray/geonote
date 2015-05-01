@@ -13,7 +13,7 @@
         android:textColorHint="#AAAAAA"
         style="@style/ParseLoginUI.EditText"
         android:hint="@string/com_parse_ui_username_input_hint"
-        android:textColor="@android:color/white" />
+        android:textColor="#1976D2" />
 
     <EditText
         android:id="@+id/login_password_input"
@@ -26,7 +26,7 @@
         android:inputType="textPassword"
         android:selectAllOnFocus="true"
         android:textColorHint="#AAAAAA"
-        android:textColor="@android:color/white" />
+        android:textColor="#1976D2" />
 
     <LinearLayout
         android:id="@+id/parse_buttons"
@@ -38,14 +38,16 @@
             android:id="@+id/parse_login_button"
             style="@style/ParseLoginUI.Button"
             android:layout_weight="0.5"
-            android:text="@string/com_parse_ui_parse_login_button_label" />
+            android:text="@string/com_parse_ui_parse_login_button_label"
+            android:background="@android:color/transparent" />
 
         <Button
             android:id="@+id/parse_signup_button"
             style="@style/ParseLoginUI.Button"
             android:layout_marginLeft="@dimen/com_parse_ui_small_horizontal_spacing"
             android:layout_weight="0.5"
-            android:text="@string/com_parse_ui_parse_signup_button_label" />
+            android:text="@string/com_parse_ui_parse_signup_button_label"
+            android:background="@android:color/transparent" />
     </LinearLayout>
 
     <Button
@@ -53,5 +55,6 @@
         style="@style/ParseLoginUI.HelpButton"
         android:layout_marginTop="@dimen/com_parse_ui_small_vertical_spacing"
         android:layout_marginBottom="@dimen/com_parse_ui_small_vertical_spacing"
+        android:textColor="#727272"
         android:text="@string/com_parse_ui_forgot_password_button_label" />
 </LinearLayout>

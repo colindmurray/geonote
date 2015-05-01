@@ -208,7 +208,15 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         mToolbarManager.notifyNavigationStateChanged();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
     @Override
     public List<GeoPostObj> getGeopostObjects() {
