@@ -11,4 +11,7 @@ public interface MainActivityInteractionInterface {
     public List<GeoPostObj> getGeopostObjects();
     public void doParseQuery();
     public LatLng getCurrentLocation();
+    public void broadcastNewLocation(LatLng newLocation);
+    public void setLocation(LatLng newLocation);
+    public void doParseQueryIfLargeLocationChangeOrTimeout();
 }

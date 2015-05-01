@@ -1,5 +1,6 @@
 package info.geopost.geopost;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -22,11 +23,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.HashMap;
@@ -44,7 +41,7 @@ import java.util.Set;
  * Use the {@link GeoMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapFragmentInteraction {
+public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener, FragmentInteractionInterface {
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
@@ -85,6 +82,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     // Set map to current user location on first location event.
     private boolean zoomToUserLocation = true;
     private com.rey.material.widget.FloatingActionButton mUpvoteButton;
+    private MainActivityInteractionInterface mMainActivity;
 
     /**
      * Use this factory method to create a new instance of
@@ -112,6 +110,17 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 //        setupParse();
         Log.e(TAG, "Current user is: " + ParseUser.getCurrentUser().getUsername());
 //        setUpMapIfNeeded();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mMainActivity = (MainActivityInteractionInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
     @Override
@@ -253,30 +262,21 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
-            if(mCurrentLocation != null) {
-                mLastLocation = mCurrentLocation;
-            }
-
-            mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            // Updates current location in this, MainActivity, and other fragments.
+            mMainActivity.broadcastNewLocation(new LatLng(location.getLatitude(), location.getLongitude()));
 
             // Set camera location if this is first location event received (map has just been opened)
-            if(mMap != null && mCurrentLocation != null && zoomToUserLocation){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLocation, 16.0f));
-                zoomToUserLocation = false;
-            }
+//            if(mMap != null && mCurrentLocation != null && zoomToUserLocation){
+//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLocation, 16.0f));
+//                zoomToUserLocation = false;
+//            }
             Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
 
             // disable markers now out of range, enable markers in range.
             recalculateUserMarkerDistances();
             // Perform mapQuery if current vs last location within certain distance interval.
 
-            if(mLastParseQueryLocation != null) {
-                ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
-                ParseGeoPoint curLoc = new ParseGeoPoint(mCurrentLocation.latitude, mCurrentLocation.longitude);
-                if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE || ((System.currentTimeMillis() - mLastParseQueryTime) > PARSE_QUERY_TIMEOUT) ) {
-                    doMapQuery();
-                }
-            }
+            mMainActivity.doParseQueryIfLargeLocationChangeOrTimeout();
         }
     };
 
@@ -371,6 +371,11 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
         // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
         cleanUpMarkers(toKeep);
+    }
+
+    @Override
+    public void setCurrentLocation(LatLng currentLocation) {
+        mCurrentLocation = currentLocation;
     }
 
     /**

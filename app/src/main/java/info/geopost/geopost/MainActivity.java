@@ -21,7 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-<<<<<<< HEAD
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
@@ -29,11 +28,8 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-=======
 import com.parse.LogOutCallback;
-import com.parse.ParseException;
 import com.parse.ParseUser;
->>>>>>> ceaff7748adb0d2568936583cb0665c3bbabe3ee
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.TabPageIndicator;
@@ -49,6 +45,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
     private static final int MAX_POST_SEARCH_RESULTS = 75;
+    private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
     // Conversion from kilometers to meters
     private static final int METERS_PER_KILOMETER = 1000;
     private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
@@ -68,7 +65,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private FloatingActionButton mPostButton;
 
-    private OnMapFragmentInteraction mMapFragmentListener;
+    private FragmentInteractionInterface mMapFragmentListener;
 
 
     private DrawerLayout dl_navigator;
@@ -83,7 +80,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     private ToolbarManager mToolbarManager;
     private SnackBar mSnackBar;
     private Tab[] mItems = new Tab[]{Tab.MAPS, Tab.TABLE};
-    private final String TAG = "MainActivity";
     private long geopoints = 9001;
 
     @Override
@@ -170,6 +166,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             }
 
         });
+        doParseQuery();
 
     }
 
@@ -261,6 +258,29 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         return mCurrentLocation;
     }
 
+    @Override
+    public void broadcastNewLocation(LatLng newLocation) {
+        mCurrentLocation = newLocation;
+        mMapFragmentListener.setCurrentLocation(mCurrentLocation);
+
+    }
+
+    @Override
+    public void setLocation(LatLng newLocation) {
+        mCurrentLocation = newLocation;
+    }
+
+    @Override
+    public void doParseQueryIfLargeLocationChangeOrTimeout() {
+        if(mLastParseQueryLocation != null) {
+            ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
+            ParseGeoPoint curLoc = new ParseGeoPoint(mCurrentLocation.latitude, mCurrentLocation.longitude);
+            if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE || ((System.currentTimeMillis() - mLastParseQueryTime) > PARSE_QUERY_TIMEOUT) ) {
+                doParseQuery();
+            }
+        }
+    }
+
     private ParseGeoPoint geoPointFromLocation(LatLng loc) {
         return new ParseGeoPoint(loc.latitude, loc.longitude);
     }
@@ -343,7 +363,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                 switch (mTabs[position]) {
                     case MAPS:
                         mFragments[position] = GeoMapFragment.newInstance();
-                        mMapFragmentListener = (OnMapFragmentInteraction) mFragments[position];
+                        mMapFragmentListener = (FragmentInteractionInterface) mFragments[position];
                         break;
                     case TABLE:
                         mFragments[position] = TableFragment.newInstance();
