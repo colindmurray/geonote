@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -45,18 +46,14 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
-//    private static final int MAX_POST_SEARCH_DISTANCE = 100;
-//    private static final int MAX_POST_SEARCH_RESULTS = 75;
-    private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
+
     private static final String PREF_CURRENT_LAT = "mCurrentLat";
     private static final String PREF_CURRENT_LON = "mCurrentLon";
     private static final String PREF_LAST_LAT = "mLastLat";
     private static final String PREF_LAST_LON = "mLastLon";
 
     // Conversion from kilometers to meters
-    private static final int METERS_PER_KILOMETER = 1000;
     private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
-    private static final long PARSE_QUERY_TIMEOUT = 30000;
 
     private GoogleMap mMap;
     private static final String TAG = GeoMapFragment.class.getSimpleName();
@@ -64,15 +61,10 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
     private LatLng mLastLocation = new LatLng(0.0, 0.0);
     //    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
-    private HashMap<String, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
-//    private String mSelectedPostObjectId;
-//    private long mLastParseQueryTime;
-//    private LatLng mLastParseQueryLocation;
+    private HashMap<Marker, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
+
     // Fields for the map radius in feet
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
-
-    //hold on to the list returned by a Parse Query
-    private List<GeoPostObj> geoPostObjList;
 
     private CharSequence mTitle;
 
@@ -83,6 +75,8 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private boolean zoomToUserLocation = true;
     private com.rey.material.widget.FloatingActionButton mUpvoteButton;
     private MainActivityInteractionInterface mMainActivity;
+    private TextView mModalUserName;
+    private TextView mModalTextBody;
 
     /**
      * Use this factory method to create a new instance of
@@ -186,75 +180,16 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     }
 
 
-
-//    private void doMapQuery() {
-//        // 1
-//        LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-//        if (myLoc == null) {
-//            cleanUpMarkers(new HashSet<String>());
-//            return;
-//        }
-//        // 2
-//        Log.d(TAG, "doMapQuery called.");
-//        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-//        // 3
-//        ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
-//        // 4
-//        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
-//        // 5
-//        mapQuery.include("user");
-//        mapQuery.orderByDescending("createdAt");
-//        mapQuery.setLimit(MAX_POST_SEARCH_RESULTS);
-//        // 6
-//        mapQuery.findInBackground(new FindCallback<GeoPostObj>() {
-//            @Override
-//            public void done(List<GeoPostObj> objects, ParseException e) {
-//                // Check for errors
-//
-//                // No errors, process query results
-//                // 1
-//                geoPostObjList = objects;
-//                mLastParseQueryTime = System.currentTimeMillis();
-//                mLastParseQueryLocation = mCurrentLocation;
-//                Set<String> toKeep = new HashSet<>();
-//                if (objects != null)
-//                    Log.d(TAG, "doMapQuery finished: " + objects.size() + " GeoPost items retrieved.");
-//                for (GeoPostObj post : objects) {
-//
-//                    toKeep.add(post.getObjectId());
-//                    GeoPostMarker oldMarker = mGeoPostMarkers.get(post.getObjectId());
-//                    LatLng loc = latLngFromParseGeoPoint(post.getLocation());
-//
-//                    if(oldMarker == null) {
-//                        GeoPostMarker newMarker;
-//                        if(getDistanceInMeters(loc, mCurrentLocation) <= mRadius) {
-//                            newMarker = new GeoPostMarker(post, newEnabledMarker(post),  true);
-//                        } else {
-//                            newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
-//                        }
-//                        mGeoPostMarkers.put(post.getObjectId(), newMarker);
-//                    }
-//                }
-//
-//                // We call the cleanUpMarkers() method and pass in the toKeep variable to remove any unwanted markers from the map.
-//                cleanUpMarkers(toKeep);
-//            }
-//        });
-//    }
-
-//    private ParseGeoPoint geoPointFromLocation(LatLng loc) {
-//        return new ParseGeoPoint(loc.latitude, loc.longitude);
-//    }
-
     private LatLng latLngFromParseGeoPoint(ParseGeoPoint point) {
         return new LatLng(point.getLatitude(), point.getLongitude());
     }
 
     private void cleanUpMarkers(Set<String> markersToKeep) {
-        for (String objId : new HashSet<>(mGeoPostMarkers.keySet())) {
-            if (!markersToKeep.contains(objId)) {
-                mGeoPostMarkers.get(objId).marker.remove();
-                mGeoPostMarkers.remove(objId);
+        for (GeoPostMarker geoPostMarker : new HashSet<>(mGeoPostMarkers.values())) {
+            String geoPostId = geoPostMarker.geoPostObj.getObjectId();
+            if (!markersToKeep.contains(geoPostId)) {
+                mGeoPostMarkers.get(geoPostId).marker.remove();
+                mGeoPostMarkers.remove(geoPostId);
             }
         }
     }
@@ -265,11 +200,6 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
             // Updates current location in this, MainActivity, and other fragments.
             mMainActivity.broadcastNewLocation(new LatLng(location.getLatitude(), location.getLongitude()));
 
-            // Set camera location if this is first location event received (map has just been opened)
-//            if(mMap != null && mCurrentLocation != null && zoomToUserLocation){
-//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLocation, 16.0f));
-//                zoomToUserLocation = false;
-//            }
             Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
 
             // disable markers now out of range, enable markers in range.
@@ -365,7 +295,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                 } else {
                     newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
                 }
-                mGeoPostMarkers.put(post.getObjectId(), newMarker);
+                mGeoPostMarkers.put(newMarker.marker, newMarker);
             }
         }
 
@@ -395,12 +325,20 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        GeoPostMarker postMarker = mGeoPostMarkers.get(marker);
+        if(mGeoPostMarkers.containsKey(marker)) {
+            Log.d(TAG, "GeoPostMarker Text: " + mGeoPostMarkers.get(marker).geoPostObj.getText());
+        }
 
         //        Testing modal
         boolean wrapInScrollView = true;
         MaterialDialog m = new MaterialDialog.Builder(getActivity())
                 .customView(R.layout.activity_modal, wrapInScrollView)
                 .show();
+        mModalUserName = (TextView) m.findViewById(R.id.postUserNameTextView);
+        mModalUserName.setText(postMarker.geoPostObj.getUser().getUsername());
+        mModalTextBody = (TextView) m.findViewById(R.id.postTextBody);
+        mModalTextBody.setText(postMarker.geoPostObj.getText());
         mUpvoteButton = (com.rey.material.widget.FloatingActionButton) m.findViewById(R.id.upvote_button);
         mUpvoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
