@@ -1,9 +1,12 @@
 package info.geopost.geopost;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -35,20 +38,9 @@ import java.util.Set;
 
 public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener, FragmentInteractionInterface {
 
-    // Used to pass location from MainActivity to PostActivity
-    public static final String INTENT_EXTRA_LOCATION = "location";
-
-    private static final String PREF_CURRENT_LAT = "mCurrentLat";
-    private static final String PREF_CURRENT_LON = "mCurrentLon";
-    private static final String PREF_LAST_LAT = "mLastLat";
-    private static final String PREF_LAST_LON = "mLastLon";
-
-    // Conversion from kilometers to meters
-    private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
-
     private GoogleMap mMap;
     private static final String TAG = GeoMapFragment.class.getSimpleName();
-    private FloatingActionButton mPostButton;
+
     // Dialog attributes
     private MaterialDialog mMaterialDialog;
     private com.rey.material.widget.FloatingActionButton mDownVoteButton;
@@ -64,17 +56,15 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     // Current Location
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
 
-    private LatLng mLastLocation = new LatLng(0.0, 0.0);
-
     //    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
     private HashMap<Marker, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
 
     // Fields for the map radius in feet
-    private float mRadius = DEFAULT_SEARCH_DISTANCE;
-    // Access basic application info
-    private SharedPreferences mPrefs;
+    private float mRadius = MainActivity.DEFAULT_SEARCH_DISTANCE;
+
     // Set map to current user location on first location event.
     private MainActivityInteractionInterface mMainActivity;
+    private boolean mZoomOnFirstLocationEvent = false;
 
     /**
      * Use this factory method to create a new instance of
@@ -83,9 +73,11 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
      * @return A new instance of fragment MapFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GeoMapFragment newInstance() {
+    public static GeoMapFragment newInstance(LatLng location) {
         GeoMapFragment fragment = new GeoMapFragment();
         Bundle args = new Bundle();
+        args.putDouble("lat", location.latitude);
+        args.putDouble("lon", location.longitude);
         fragment.setArguments(args);
 
         return fragment;
@@ -118,7 +110,11 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_map, container, false);
-
+        Bundle args = getArguments();
+        if(args != null) {
+            mCurrentLocation = new LatLng(args.getDouble("lat"),
+                                          args.getDouble("lon"));
+        }
         mMaterialDialog = new MaterialDialog.Builder(getActivity())
                 .customView(R.layout.activity_modal, true).build();
         mModalUserName = (TextView) mMaterialDialog.findViewById(R.id.postUserNameTextView);
@@ -144,15 +140,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                 mSelectedGeoPostMarker.geoPostObj.setVotes(votes);
             }
         });
-        mPostButton = (FloatingActionButton) v.findViewById(R.id.map_post_button);
-        mPostButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-                Intent intent = new Intent(getActivity(), PostActivity.class);
-                intent.putExtra(GeoMapFragment.INTENT_EXTRA_LOCATION, myLoc);
-                startActivity(intent);
-            }
-        });
+
         MapView view = (MapView) v.findViewById(R.id.map);
         view.onCreate(savedInstanceState);
         view.onResume();
@@ -161,26 +149,18 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         mMap.setMyLocationEnabled(true);
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
-                // TODO possibly get new markers when moving map?
-//                doMapQuery();
+                // Redo parse query in new location if user
+//                if(mCurrentLocation != null) {
+                      // TODO: make this based on last parse query location
+//                    LatLng cameraLoc = mMap.getCameraPosition().target;
+//                    if (getDistanceInMeters(mCurrentLocation, cameraLoc) > MainActivity.MAX_POST_SEARCH_DISTANCE) {
+//                        Log.d(TAG, "User viewing map location far away from current location.  Performing new parse query.");
+//                        mMainActivity.doParseQuery(cameraLoc);
+//                    }
+//                }
             }
         });
 
-        mPrefs = this.getActivity().getSharedPreferences("GeoNote_prefs", 0);
-
-        if (savedInstanceState == null) {
-            double currentLat = mPrefs.getFloat(PREF_CURRENT_LAT, 0);
-            double currentLon = mPrefs.getFloat(PREF_CURRENT_LON, 0);
-            double lastLat = mPrefs.getFloat(PREF_LAST_LAT, 0);
-            double lastLon = mPrefs.getFloat(PREF_LAST_LON, 0);
-            mCurrentLocation = new LatLng(currentLat, currentLon);
-            mLastLocation = new LatLng(lastLat, lastLon);
-            Log.d(TAG, "onCreate getting saved prefs:\n" +
-                    "curLat: " + mCurrentLocation.latitude +
-                    " curLon: " + mCurrentLocation.longitude +
-                    " lastLat: " + mLastLocation.latitude +
-                    " lastLon: " + mLastLocation.longitude);
-        }
         setUpMap();
         return v;
     }
@@ -189,13 +169,16 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         mMap.setMyLocationEnabled(true);
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMyLocationChangeListener(myLocationChangeListener);
+        if(mCurrentLocation != null) {
         // Move map camera to saved location if one exists.
-        if(mCurrentLocation.latitude != 0.0 && mCurrentLocation.longitude != 0.0) {
+//        if(mCurrentLocation.latitude != 0.0 && mCurrentLocation.longitude != 0.0) {
             CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
             Log.d(TAG, "setUpMap restoring camera position to:\n" +
                     "curLat: " + mCurrentLocation.latitude +
                     " curLon: " + mCurrentLocation.longitude);
+        } else {
+            mZoomOnFirstLocationEvent = true;
         }
     }
 
@@ -205,13 +188,14 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     }
 
     private void cleanUpMarkers(Set<String> markersToKeep) {
-        for (GeoPostMarker geoPostMarker : new HashSet<>(mGeoPostMarkers.values())) {
-            String geoPostId = geoPostMarker.geoPostObj.getObjectId();
-            if (!markersToKeep.contains(geoPostId)) {
-                mGeoPostMarkers.get(geoPostId).marker.remove();
-                mGeoPostMarkers.remove(geoPostId);
-            }
-        }
+        //TODO: Fix this, it don't work
+//        for (GeoPostMarker geoPostMarker : new HashSet<>(mGeoPostMarkers.values())) {
+//            String geoPostId = geoPostMarker.geoPostObj.getObjectId();
+//            if (!markersToKeep.contains(geoPostId)) {
+//                mGeoPostMarkers.get(geoPostId).marker.remove();
+//                mGeoPostMarkers.remove(geoPostId);
+//            }
+//        }
     }
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
@@ -219,6 +203,16 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         public void onMyLocationChange(Location location) {
             // Updates current location in this, MainActivity, and other fragments.
             mMainActivity.broadcastNewLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+
+            // Backup if location isn't determined before this event.
+            if(mZoomOnFirstLocationEvent) {
+                CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
+                Log.d(TAG, "Moving camera position to:\n" +
+                        "curLat: " + mCurrentLocation.latitude +
+                        " curLon: " + mCurrentLocation.longitude);
+                mZoomOnFirstLocationEvent = false;
+            }
 
             Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
 

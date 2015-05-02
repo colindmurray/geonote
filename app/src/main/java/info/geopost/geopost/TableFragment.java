@@ -20,6 +20,7 @@ import it.gmariotti.cardslib.library.view.CardListView;
 public class  TableFragment extends Fragment implements FragmentInteractionInterface{
 
     private final String TAG = getTag();
+    private LatLng mCurrentLocation;
 
     /**
      * Use this factory method to create a new instance of
@@ -27,9 +28,11 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
      *
      * @return A new instance of fragment TableFragment.
      */
-    public static TableFragment newInstance() {
+    public static TableFragment newInstance(LatLng location) {
         TableFragment fragment = new TableFragment();
         Bundle args = new Bundle();
+        args.putDouble("lat", location.latitude);
+        args.putDouble("lon", location.longitude);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,6 +50,11 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_table, container, false);
+        Bundle args = getArguments();
+        if(args != null) {
+            mCurrentLocation = new LatLng(args.getDouble("lat"),
+                    args.getDouble("lon"));
+        }
         return view;
 
     }
@@ -68,6 +76,6 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
 
     @Override
     public void setCurrentLocation(LatLng currentLocation) {
-
+        mCurrentLocation = currentLocation;
     }
 }

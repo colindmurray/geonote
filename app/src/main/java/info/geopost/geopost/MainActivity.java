@@ -1,6 +1,10 @@
 package info.geopost.geopost;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -43,12 +47,15 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int MAX_POST_SEARCH_DISTANCE = 100;
-    private static final int MAX_POST_SEARCH_RESULTS = 75;
-    private static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
+    // Used to pass location from MainActivity to PostActivity
+    public static final String INTENT_EXTRA_LOCATION = "location";
 
-    // Conversion from kilometers to meters
-    private static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
+
+    public static final int MAX_POST_SEARCH_DISTANCE = 100;
+    public static final int MAX_POST_SEARCH_RESULTS = 75;
+    public static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
+
+    public static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
     private static final long PARSE_QUERY_TIMEOUT = 30000;
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
 
@@ -61,9 +68,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     //Get location
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
-    private LatLng mLastLocation = new LatLng(0.0, 0.0);
-
-    private FloatingActionButton mPostButton;
 
     private FragmentInteractionInterface mMapFragmentListener;
     private FragmentInteractionInterface mTableFragmentListerner;
@@ -81,6 +85,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     private SnackBar mSnackBar;
     private Tab[] mItems = new Tab[]{Tab.MAPS, Tab.TABLE};
     private long geopoints = 9001;
+
+    private FloatingActionButton mPostButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +174,26 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             }
 
         });
-        doParseQuery();
+
+        mPostButton = (FloatingActionButton) findViewById(R.id.post_button);
+        mPostButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                LatLng myLoc = mCurrentLocation;
+                Intent intent = new Intent(getApplicationContext(), PostActivity.class);
+                intent.putExtra(INTENT_EXTRA_LOCATION, myLoc);
+                startActivity(intent);
+            }
+        });
+        // get last location from android device.
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+        if (location != null) {
+            setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+        }
+
+        doParseQuery(null);
 
     }
 
@@ -224,10 +249,14 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     }
 
     @Override
-    public void doParseQuery() {
-        LatLng myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+    public void doParseQuery(LatLng location) {
         Log.d(TAG, "doMapQuery called.");
-        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+        final ParseGeoPoint myPoint;
+        if(location != null) {
+            myPoint = geoPointFromLocation(location);
+        } else {
+            myPoint = geoPointFromLocation(mCurrentLocation);
+        }
         ParseQuery<GeoPostObj> mapQuery = GeoPostObj.getQuery();
         mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
         mapQuery.include("user");
@@ -276,7 +305,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             ParseGeoPoint lastLoc = new ParseGeoPoint(mLastParseQueryLocation.latitude, mLastParseQueryLocation.longitude);
             ParseGeoPoint curLoc = new ParseGeoPoint(mCurrentLocation.latitude, mCurrentLocation.longitude);
             if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE || ((System.currentTimeMillis() - mLastParseQueryTime) > PARSE_QUERY_TIMEOUT) ) {
-                doParseQuery();
+                doParseQuery(null);
             }
         }
     }
@@ -362,11 +391,11 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             if(mFragments[position] == null){
                 switch (mTabs[position]) {
                     case MAPS:
-                        mFragments[position] = GeoMapFragment.newInstance();
+                        mFragments[position] = GeoMapFragment.newInstance(mCurrentLocation);
                         mMapFragmentListener = (FragmentInteractionInterface) mFragments[position];
                         break;
                     case TABLE:
-                        mFragments[position] = TableFragment.newInstance();
+                        mFragments[position] = TableFragment.newInstance(mCurrentLocation);
                         mTableFragmentListerner = (FragmentInteractionInterface) mFragments[position];
                         break;
                 }

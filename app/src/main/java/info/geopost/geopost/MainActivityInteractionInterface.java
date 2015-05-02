@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface MainActivityInteractionInterface {
     public List<GeoPostObj> getGeopostObjects();
-    public void doParseQuery();
+    public void doParseQuery(LatLng location);
     public LatLng getCurrentLocation();
     public void broadcastNewLocation(LatLng newLocation);
     public void setLocation(LatLng newLocation);

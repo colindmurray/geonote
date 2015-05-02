@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_dl"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -38,6 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+
         </LinearLayout>
 
         <com.rey.material.widget.SnackBar
@@ -46,6 +47,18 @@
             android:layout_height="48dp"
             android:visibility="gone"
             android:layout_gravity="bottom"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/post_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_icon="@drawable/ic_add_white_24dp"
+            fab:fab_colorNormal="@color/accent"
+            fab:fab_colorPressed="@color/primary"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="end|bottom" />
 
     </FrameLayout>
 
