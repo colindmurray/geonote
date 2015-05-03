@@ -30,6 +30,6 @@
         android:id="@+id/list_cardId"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        style="@style/native_list_card.base"/>
+        style="@style/native_list_card.base" />
 
 </LinearLayout>
