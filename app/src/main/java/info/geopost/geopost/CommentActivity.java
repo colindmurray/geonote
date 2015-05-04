@@ -27,7 +27,7 @@ public class CommentActivity extends ActionBarActivity {
 
         ArrayList<Card> cards = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            GeoCard card = new GeoCard(this, geoPostObj);
+            GeoCard card = new GeoCard(this, geoPostObj, null, null);
             cards.add(card);
         }
         CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(this,cards);

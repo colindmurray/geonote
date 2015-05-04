@@ -1,6 +1,7 @@
 package info.geopost.geopost;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.ParseObject;
 
 import java.util.List;
 

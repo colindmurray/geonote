@@ -155,7 +155,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                 }
             });
         }
-        lv_drawer.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, navNames));
+        lv_drawer.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1, navNames));
         lv_drawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
