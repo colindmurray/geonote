@@ -1,0 +1,95 @@
+<it.gmariotti.cardslib.library.view.ForegroundLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_main_layout"
+    style="@style/card.native.main_layout_foreground"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:id="@+id/card_main_content_layout"
+        style="@style/card.native.content_outer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_base_empty_height"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/relativeLayout"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="81dp"
+                android:text="Colin's mom has got it going on"
+                android:id="@+id/textView"
+                android:layout_gravity="left|top"
+                android:layout_above="@+id/username"
+                android:layout_alignParentTop="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jeremy"
+                android:id="@+id/username"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 hour ago"
+                android:id="@+id/time"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/username"
+                android:layout_toEndOf="@+id/username"
+                android:layout_marginLeft="45dp"
+                android:layout_marginStart="45dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/voteButtonWrapper"
+            android:layout_alignBottom="@+id/relativeLayout"
+            android:layout_weight="4">
+
+            <com.rey.material.widget.FloatingActionButton
+                style="@style/Material.Widget.FloatingActionButton.Light"
+                android:id="@+id/upvote_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_iconSrc="@drawable/up_vote"
+                app:fab_backgroundColor="#ffffff"
+                android:layout_alignParentTop="true"
+                android:layout_alignLeft="@+id/downvote_button"
+                android:layout_alignStart="@+id/downvote_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:id="@+id/voteRatioTextView"
+                android:textColor="@color/secondary_text"
+                android:textSize="20dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+
+            <com.rey.material.widget.FloatingActionButton
+                style="@style/Material.Widget.FloatingActionButton.Light"
+                android:id="@+id/downvote_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_iconSrc="@drawable/down_vote"
+                app:fab_backgroundColor="#ffffff"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    </it.gmariotti.cardslib.library.view.ForegroundLinearLayout>

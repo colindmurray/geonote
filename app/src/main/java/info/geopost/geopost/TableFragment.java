@@ -1,5 +1,6 @@
 package info.geopost.geopost;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -52,8 +53,7 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
         View view = inflater.inflate(R.layout.fragment_table, container, false);
         Bundle args = getArguments();
         if(args != null) {
-            mCurrentLocation = new LatLng(args.getDouble("lat"),
-                    args.getDouble("lon"));
+            mCurrentLocation = new LatLng(args.getDouble("lat"), args.getDouble("lon"));
         }
         return view;
 
@@ -65,6 +65,15 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
         ArrayList<Card> cards = new ArrayList<>();
         for (GeoPostObj post : geoPostObjList) {
             GeoCard card = new GeoCard(getActivity(), post);
+            card.setOnClickListener(new Card.OnCardClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Intent intent = new Intent(getActivity(), CommentActivity.class);
+                    GeoCard geoCard = (GeoCard) card;
+                    CommentActivity.geoPostObj = geoCard.getmGeoPostObj();
+                    startActivity(intent);
+                }
+            });
             cards.add(card);
         }
         CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(getActivity().getApplicationContext(),cards);

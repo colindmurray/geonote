@@ -1,17 +1,40 @@
 package info.geopost.geopost;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
+import it.gmariotti.cardslib.library.view.CardListView;
 
 
 public class CommentActivity extends ActionBarActivity {
+
+    public static GeoPostObj geoPostObj;
+    private TextView username;
+    private TextView body;
+    private final String TAG = "CommentActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
+
+        ArrayList<Card> cards = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            GeoCard card = new GeoCard(this, geoPostObj);
+            cards.add(card);
+        }
+        CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(this,cards);
+        CardListView listView = (CardListView) findViewById(R.id.commentList);
+        if (listView!=null){
+            listView.setAdapter(mCardArrayAdapter);
+        }
     }
 
     @Override

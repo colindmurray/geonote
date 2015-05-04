@@ -22,17 +22,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.LogOutCallback;
 import com.parse.ParseUser;
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.widget.SnackBar;
@@ -138,14 +137,11 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                 //Switch on position here.
                 switch(position){
                     case 0:
-                        TextView tv = (TextView) view;
-                        tv.setText("Username: " + ParseUser.getCurrentUser().getUsername());
-                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
-                        TextView tv2 = (TextView) view;
-                        tv2.setText("Test: " + ParseUser.getCurrentUser().getUsername());
-                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
+//                        TextView tv2 = (TextView) view;
+//                        tv2.setText("Test: " + ParseUser.getCurrentUser().getUsername());
+//                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
                         logoutParseUser();
