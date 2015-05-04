@@ -28,18 +28,24 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.LogOutCallback;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.rey.material.app.ToolbarManager;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.TabPageIndicator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -85,6 +91,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     private SnackBar mSnackBar;
     private Tab[] mItems = new Tab[]{Tab.MAPS, Tab.TABLE};
     private long geopoints = 9001;
+    private ParseObject mUserData;
 
     private FloatingActionButton mPostButton;
 
@@ -130,6 +137,25 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         navNames[0] = ParseUser.getCurrentUser().getUsername();
         navNames[1] = "GeoPoints: " + geopoints;
         navNames[2] = "Logout";
+        ParseObject userDataPointer = ParseUser.getCurrentUser().getParseObject("UserData");
+        if(userDataPointer == null) {
+            mUserData = new ParseObject("UserData");
+            ParseUser.getCurrentUser().put("UserData", mUserData);
+            mUserData.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    ParseUser.getCurrentUser().put("UserData", mUserData);
+                    ParseUser.getCurrentUser().saveInBackground();
+                }
+            });
+
+        } else {
+            userDataPointer.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                public void done(ParseObject userData, ParseException e) {
+                    mUserData = userData;
+                }
+            });
+        }
         lv_drawer.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, navNames));
         lv_drawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -308,6 +334,11 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                 doParseQuery(null);
             }
         }
+    }
+
+    @Override
+    public ParseObject getUserData() {
+        return mUserData;
     }
 
     private ParseGeoPoint geoPointFromLocation(LatLng loc) {

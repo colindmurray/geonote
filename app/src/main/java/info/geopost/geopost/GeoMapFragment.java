@@ -2,8 +2,10 @@ package info.geopost.geopost;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.gc.materialdesign.views.ButtonFloat;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,6 +32,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
+
+import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,8 +61,8 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     // Current Location
     private LatLng mCurrentLocation = new LatLng(0.0, 0.0);
 
-    //    private HashMap<String, Marker> mMapMarkers = new HashMap<>();
     private HashMap<Marker, GeoPostMarker> mGeoPostMarkers = new HashMap<>();
+    private HashMap<String, GeoPostMarker> mGeoPostsIdsToMarkers = new HashMap<>();
 
     // Fields for the map radius in feet
     private float mRadius = MainActivity.DEFAULT_SEARCH_DISTANCE;
@@ -65,6 +70,14 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     // Set map to current user location on first location event.
     private MainActivityInteractionInterface mMainActivity;
     private boolean mZoomOnFirstLocationEvent = false;
+    private int mCurrentVote = 0;
+
+    private Drawable upvote_pressed;
+    private Drawable downvote_pressed;
+    private Drawable upvote_unpressed;
+    private Drawable downvote_unpressed;
+    private int mLastVote;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -115,31 +128,36 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
             mCurrentLocation = new LatLng(args.getDouble("lat"),
                                           args.getDouble("lon"));
         }
+
         mMaterialDialog = new MaterialDialog.Builder(getActivity())
-                .customView(R.layout.activity_modal, true).build();
+                .customView(R.layout.activity_modal, false).cancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Log.d(TAG, "Cancelled dialog!");
+
+                    }
+                }).showListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+//                        setModalVoteStatus(mCurrentVote);
+
+                        updateModalVoteStatus(mCurrentVote, mLastVote, true);
+                    }
+                }).cancelable(true).build();
+        mMaterialDialog.setCanceledOnTouchOutside(true);
         mModalUserName = (TextView) mMaterialDialog.findViewById(R.id.postUserNameTextView);
         mModalTextBody = (TextView) mMaterialDialog.findViewById(R.id.postTextBody);
         mModalVoteRatio = (TextView) mMaterialDialog.findViewById(R.id.voteRatioTextView);
         mUpvoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.upvote_button);
-        mUpvoteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Upvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
-                int votes = mSelectedGeoPostMarker.geoPostObj.getVotes() + 1;
-                mModalVoteRatio.setText("" + votes);
-                mSelectedGeoPostMarker.geoPostObj.setVotes(votes);
-            }
-        });
+        mUpvoteButton.setOnClickListener(mUpvoteClickListener);
         mDownVoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.downvote_button);
-        mDownVoteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Downvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
-                int votes = mSelectedGeoPostMarker.geoPostObj.getVotes() - 1;
-                mModalVoteRatio.setText("" + votes);
-                mSelectedGeoPostMarker.geoPostObj.setVotes(votes);
-            }
-        });
+        mDownVoteButton.setOnClickListener(mDownvoteClickListener);
+        mLastVote = 0;
+
+        upvote_pressed = getResources().getDrawable(R.drawable.up_vote);
+        downvote_pressed = getResources().getDrawable(R.drawable.down_vote);
+        upvote_unpressed = getResources().getDrawable(R.drawable.up_vote_unpressed);
+        downvote_unpressed = getResources().getDrawable(R.drawable.down_vote_unpressed);
 
         MapView view = (MapView) v.findViewById(R.id.map);
         view.onCreate(savedInstanceState);
@@ -188,15 +206,15 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     }
 
     private void cleanUpMarkers(Set<String> markersToKeep) {
-        //TODO: Fix this, it don't work
-//        for (GeoPostMarker geoPostMarker : new HashSet<>(mGeoPostMarkers.values())) {
-//            String geoPostId = geoPostMarker.geoPostObj.getObjectId();
-//            if (!markersToKeep.contains(geoPostId)) {
-//                mGeoPostMarkers.get(geoPostId).marker.remove();
-//                mGeoPostMarkers.remove(geoPostId);
-//            }
-//        }
+        for (Map.Entry<String, GeoPostMarker> entry : mGeoPostsIdsToMarkers.entrySet()) {
+            if (!markersToKeep.contains(entry.getKey())) {
+                mGeoPostMarkers.get(entry.getValue().marker).marker.remove();
+                mGeoPostMarkers.remove(entry.getValue().marker);
+                mGeoPostsIdsToMarkers.remove(entry.getKey());
+            }
+        }
     }
+
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
@@ -226,8 +244,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     private void recalculateUserMarkerDistances(){
         Log.d(TAG, "Recalculating user markers.");
-        for(Map.Entry entry : mGeoPostMarkers.entrySet()) {
-            GeoPostMarker geoPostMarker = (GeoPostMarker) entry.getValue();
+        for(GeoPostMarker geoPostMarker : new HashSet<>(mGeoPostMarkers.values())) {
             if(getDistanceInMeters(geoPostMarker.marker.getPosition(), mCurrentLocation) <= mRadius) {
                 enableMarker(geoPostMarker);
             } else {
@@ -239,39 +256,41 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private void enableMarker(GeoPostMarker geoPostMarker) {
         if(!geoPostMarker.enabled) {
             Log.d(TAG, "Enabling marker. post_id: " + geoPostMarker.geoPostObj.getObjectId());
+            LatLng loc = geoPostMarker.marker.getPosition();
+            mGeoPostMarkers.remove(geoPostMarker.marker);
             geoPostMarker.marker.remove();
-            geoPostMarker.marker = newEnabledMarker(geoPostMarker.geoPostObj);
+            geoPostMarker.marker = newEnabledMarker(loc);
+            mGeoPostMarkers.put(geoPostMarker.marker, geoPostMarker);
             geoPostMarker.enabled = true;
         }
     }
 
-    private Marker newEnabledMarker(GeoPostObj post) {
-        //TODO: REDO TITLE AND SNIPPET LOGIC.
-        LatLng loc = latLngFromParseGeoPoint(post.getLocation());
+    private Marker newEnabledMarker(LatLng loc) {
         MarkerOptions markerOpts =
-                new MarkerOptions().position(loc);
-        markerOpts =
-                markerOpts.title(post.getTitle())
-                        .snippet(post.getUser().getUsername())
+                new MarkerOptions().position(loc)
                         .icon(BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_GREEN));
         return mMap.addMarker(markerOpts);
+    }
+
+    private Marker newEnabledMarker(GeoPostObj post) {
+        return newEnabledMarker(latLngFromParseGeoPoint(post.getLocation()));
     }
 
     private void disableMarker(GeoPostMarker geoPostMarker) {
         if(geoPostMarker.enabled) {
             Log.d(TAG, "Disabling marker post_id: " + geoPostMarker.geoPostObj.getObjectId());
             LatLng loc = geoPostMarker.marker.getPosition();
+            mGeoPostMarkers.remove(geoPostMarker.marker);
             geoPostMarker.marker.remove();
             geoPostMarker.marker = newDisabledMarker(loc);
+            mGeoPostMarkers.put(geoPostMarker.marker, geoPostMarker);
         }
     }
 
     private Marker newDisabledMarker(LatLng loc) {
         MarkerOptions markerOpts =
-                new MarkerOptions().position(loc);
-        markerOpts =
-                markerOpts.title(getResources().getString(R.string.post_out_of_range))
+                new MarkerOptions().position(loc)
                         .icon(BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED));
         return mMap.addMarker(markerOpts);
@@ -297,19 +316,22 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         Log.d(TAG, "Updating GeoPost markers");
         Set<String> toKeep = new HashSet<>();
         for (GeoPostObj post : geoPostObjList) {
-
             toKeep.add(post.getObjectId());
+            Log.d(TAG, "Adding GeoPost obj: " + post.getObjectId() + " to posts to keep");
             GeoPostMarker oldMarker = mGeoPostMarkers.get(post.getObjectId());
             LatLng loc = latLngFromParseGeoPoint(post.getLocation());
-
             if(oldMarker == null) {
                 GeoPostMarker newMarker;
+                // Determine which markers to place based on proximity to current location
                 if(getDistanceInMeters(loc, mCurrentLocation) <= mRadius) {
+                    Log.d(TAG, "Placing object: " + post.getObjectId() + " enabled");
                     newMarker = new GeoPostMarker(post, newEnabledMarker(post),  true);
                 } else {
+                    Log.d(TAG, "Placing object: " + post.getObjectId() + " diabled");
                     newMarker = new GeoPostMarker(post, newDisabledMarker(post),  false);
                 }
                 mGeoPostMarkers.put(newMarker.marker, newMarker);
+                mGeoPostsIdsToMarkers.put(post.getObjectId(), newMarker);
             }
         }
 
@@ -345,28 +367,121 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     @Override
     public boolean onMarkerClick(final Marker marker) {
         mSelectedGeoPostMarker = mGeoPostMarkers.get(marker);
-        if(mGeoPostMarkers.containsKey(marker)) {
-            Log.d(TAG, "GeoPostMarker Text: " + mGeoPostMarkers.get(marker).geoPostObj.getText());
-        }
-        float zoom = mMap.getCameraPosition().zoom;
-        CameraPosition pos = new CameraPosition(marker.getPosition(), zoom, 0f, 0f);
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
+        Log.d(TAG, "Clicked geopost: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
+        mLastVote = mCurrentVote;
+        mCurrentVote = GeoPostObj.getVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj);
+
         mModalUserName.setText(mSelectedGeoPostMarker.geoPostObj.getUser().getUsername());
         mModalTextBody.setText(mSelectedGeoPostMarker.geoPostObj.getText());
         mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+
+        // Zoom to marker click location
+        float zoom = mMap.getCameraPosition().zoom;
         // Give camera time to move to new location.  Doing this while loading the dialog ended up being
         // really slow and choppy
-        mDelayShowDialog = new Runnable() {
+        CameraPosition pos = new CameraPosition(marker.getPosition(), zoom, 0f, 0f);
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos), 400, new GoogleMap.CancelableCallback() {
 
             @Override
-            public void run() {
+            public void onFinish() {
                 mMaterialDialog.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+//                        Log.d(TAG, "setting vote: " + mCurrentVote);
+//                        updateModalVoteStatus(-mCurrentVote, mCurrentVote, true);
+                    }
+                }, 3000);
             }
 
-        };
-        mDelayHandler.postDelayed(mDelayShowDialog, 1000);
+            @Override
+            public void onCancel() {
+
+            }
+        });
+
 
         return true;
     }
+
+    private void setModalVoteStatus(int voteStatus) {
+        switch(voteStatus) {
+            case 1:
+                mUpvoteButton.setIcon(upvote_pressed, false); //getResources().getDrawable(R.drawable.up_vote), true);
+                mDownVoteButton.setIcon(downvote_unpressed, false); //getResources().getDrawable(R.drawable.down_vote_unpressed), true);
+                break;
+            case -1:
+                mUpvoteButton.setIcon(upvote_unpressed, false); //getResources().getDrawable(R.drawable.up_vote_unpressed), true);
+                mDownVoteButton.setIcon(downvote_pressed, false); //getResources().getDrawable(R.drawable.down_vote), true);
+                break;
+            case 0:
+                mUpvoteButton.setIcon(upvote_unpressed, false); //getResources().getDrawable(R.drawable.up_vote_unpressed), true);
+                mDownVoteButton.setIcon(downvote_unpressed, false); //getResources().getDrawable(R.drawable.down_vote_unpressed), true);
+                break;
+            default:
+                mUpvoteButton.setIcon(upvote_unpressed, false); //getResources().getDrawable(R.drawable.up_vote_unpressed), true);
+                mDownVoteButton.setIcon(downvote_unpressed, false); //getResources().getDrawable(R.drawable.down_vote_unpressed), true );
+                break;
+        }
+    }
+    private void updateModalVoteStatus(int voteStatus, int currentVoteStatus, boolean animation) {
+        if(voteStatus == currentVoteStatus) {
+            return;
+        } else if (voteStatus == 1 && currentVoteStatus == -1) {
+            mUpvoteButton.setIcon(upvote_pressed, animation);
+            mDownVoteButton.setIcon(downvote_unpressed, animation);
+        } else if (voteStatus == -1 && currentVoteStatus == 1) {
+            mUpvoteButton.setIcon(upvote_unpressed, animation);
+            mDownVoteButton.setIcon(downvote_pressed, animation);
+        } else if (voteStatus == 0 && currentVoteStatus == 1) {
+            mUpvoteButton.setIcon(upvote_unpressed, animation);
+        } else if (voteStatus == 0 && currentVoteStatus == -1) {
+            mDownVoteButton.setIcon(downvote_unpressed, animation);
+        } else if (voteStatus == 1) {
+            mUpvoteButton.setIcon(upvote_pressed, animation);
+        } else if (voteStatus == -1) {
+            mDownVoteButton.setIcon(downvote_pressed, animation);
+        } else {
+            mUpvoteButton.setIcon(upvote_unpressed, animation);
+            mDownVoteButton.setIcon(downvote_unpressed, animation);
+        }
+    }
+
+    private View.OnClickListener mUpvoteClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "Upvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
+            if(mCurrentVote != GeoPostObj.UPVOTE) {
+                GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.UPVOTE);
+                updateModalVoteStatus(GeoPostObj.UPVOTE, mCurrentVote, true);
+                mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+                mCurrentVote = GeoPostObj.UPVOTE;
+            } else {
+                GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.NOVOTE);
+                updateModalVoteStatus(GeoPostObj.NOVOTE, mCurrentVote, true);
+                mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+                mCurrentVote = GeoPostObj.NOVOTE;
+            }
+        }
+    };
+
+    private View.OnClickListener mDownvoteClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "Downvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
+            if(mCurrentVote != GeoPostObj.DOWNVOTE) {
+                GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.DOWNVOTE);
+                updateModalVoteStatus(GeoPostObj.DOWNVOTE, mCurrentVote, true);
+                mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+                mCurrentVote = GeoPostObj.DOWNVOTE;
+            } else {
+                GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.NOVOTE);
+                updateModalVoteStatus(GeoPostObj.NOVOTE, mCurrentVote, true);
+                mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+                mCurrentVote = GeoPostObj.NOVOTE;
+            }
+        }
+    };
+
 
 }

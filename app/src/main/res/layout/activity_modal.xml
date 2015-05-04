@@ -92,7 +92,7 @@
                 android:id="@+id/downvote_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:fab_iconSrc="@drawable/down_vote"
+                app:fab_iconSrc="@drawable/down_vote_unpressed"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="5dp"
                 app:fab_backgroundColor="#ffffff"/>
@@ -113,7 +113,7 @@
                 android:id="@+id/upvote_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:fab_iconSrc="@drawable/up_vote"
+                app:fab_iconSrc="@drawable/up_vote_unpressed"
                 app:fab_backgroundColor="#ffffff"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/voteRatioTextView"

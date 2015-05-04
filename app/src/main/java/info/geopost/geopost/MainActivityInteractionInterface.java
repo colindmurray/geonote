@@ -1,6 +1,7 @@
 package info.geopost.geopost;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.ParseObject;
 
 import java.util.List;
 
@@ -14,4 +15,5 @@ public interface MainActivityInteractionInterface {
     public void broadcastNewLocation(LatLng newLocation);
     public void setLocation(LatLng newLocation);
     public void doParseQueryIfLargeLocationChangeOrTimeout();
+    public ParseObject getUserData();
 }

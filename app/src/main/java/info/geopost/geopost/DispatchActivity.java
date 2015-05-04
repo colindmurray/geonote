@@ -20,6 +20,7 @@ public class DispatchActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Parse.enableLocalDatastore(this);
         Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
         if (ParseUser.getCurrentUser() != null){
             String user = ParseUser.getCurrentUser().getUsername();
