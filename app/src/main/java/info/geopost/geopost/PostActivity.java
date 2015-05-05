@@ -125,7 +125,6 @@ public class PostActivity extends ActionBarActivity {
     }
 
     private void post () {
-        // 1
         GeoPostObj post = new GeoPostObj();
         post.setLocation(mGeoPoint);
         String text = getPostEditTextText();
@@ -136,13 +135,11 @@ public class PostActivity extends ActionBarActivity {
         post.setUsername(ParseUser.getCurrentUser().getUsername());
         post.setUser(ParseUser.getCurrentUser());
 
-        // 2
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
         acl.setPublicWriteAccess(true);
         post.setACL(acl);
 
-        // 3
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {

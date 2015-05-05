@@ -28,15 +28,15 @@
         android:maxLength="40"
         android:layout_toStartOf="@+id/comment_button" />
 
-    <Button
+    <com.gc.materialdesign.views.ButtonFlat
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Post"
+        android:text="Reply"
         android:id="@+id/comment_button"
         android:layout_alignTop="@+id/replyEditText"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@android:color/transparent" />
+        android:background="@color/primary" />
 
 
 </RelativeLayout>

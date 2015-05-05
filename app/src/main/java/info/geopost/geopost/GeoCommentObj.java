@@ -8,7 +8,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 
-@ParseClassName("GeoCommentObj")
+@ParseClassName("CommentObj")
 public class GeoCommentObj extends ParseObject {
     private static final String TAG = GeoCommentObj.class.getSimpleName();
 
@@ -31,12 +31,20 @@ public class GeoCommentObj extends ParseObject {
         put("votes", value);
     }
 
-    public String getGeoPostPointer() {
-        return getString("GeoPostObjPointer");
+    public ParseObject getGeoPostPointer() {
+        return getParseObject("GeoPostObjPointer");
     }
 
-    public void setGeoPostObjPointer(String value) {
+    public void setGeoPostObjPointer(ParseObject value) {
         put("GeoPostObjPointer", value);
+    }
+
+    public String getGeoPostId() {
+        return getString("GeoPostObjId");
+    }
+
+    public void setGeoPostObjId(String value) {
+        put("GeoPostObjId", value);
     }
 
     public ParseUser getUser() {
