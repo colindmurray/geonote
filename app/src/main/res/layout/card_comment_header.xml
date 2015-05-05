@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fab_iconSrc="@drawable/up_vote"
-                app:fab_backgroundColor="#ffffff"
+                app:fab_backgroundColor="@color/noVoteColor"
                 android:layout_above="@+id/voteRatioTextView"
                 android:layout_centerHorizontal="true" />
 
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fab_iconSrc="@drawable/down_vote"
-                app:fab_backgroundColor="#ffffff"
+                app:fab_backgroundColor="@color/noVoteColor"
                 android:layout_below="@+id/voteRatioTextView"
                 android:layout_centerHorizontal="true" />
 
