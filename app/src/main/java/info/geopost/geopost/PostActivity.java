@@ -35,7 +35,7 @@ public class PostActivity extends ActionBarActivity {
     private EditText mPostEditText;
     private EditText mTitleEditText;
     private TextView mCharacterCountTextView;
-    private static final int MAX_CHARACTER_COUNT = 140;
+    private static final int MAX_CHARACTER_COUNT = 300;
     private SharedPreferences mPrefs;
     private Boolean mObscureLocation;
 

@@ -1,34 +1,20 @@
 package info.geopost.geopost;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.Days;
-import org.joda.time.Hours;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Minutes;
-
-import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
@@ -64,22 +50,6 @@ public class CommentActivity extends ActionBarActivity {
         ArrayList<Card> cards = new ArrayList<>();
         CommentCardHeader card = new CommentCardHeader(this, mGeoPostObj);
         cards.add(card);
-        Date currentDate = mGeoPostObj.getCreatedAt();
-        //JodaTime is amazing!
-        LocalDateTime dateTime = new LocalDateTime(currentDate);
-        LocalDateTime currentTime = new LocalDateTime();
-        int numdays = Days.daysBetween(dateTime, currentTime).getDays();
-        int numHours = Hours.hoursBetween(dateTime, currentTime).getHours();
-        int numMinutes = Minutes.minutesBetween(dateTime, currentTime).getMinutes();
-        if (numdays > 0){
-            Log.e(TAG, "Number of days: " + numdays);
-        }
-        else if (numHours > 0){
-            Log.e(TAG, "Number of hours difference is: " + numHours);
-        }
-        else{
-            Log.e(TAG, "Number of minutes is: " + numMinutes);
-        }
 
         mCardArrayAdapter = new CardArrayAdapter(this, cards);
 
@@ -89,7 +59,7 @@ public class CommentActivity extends ActionBarActivity {
         }
 
 //        for (int i = 0; i < 15; i++) {
-//            CommentCardReply card_reply = new CommentCardReply(this, mGeoPostObj);
+//            CommentCardReply card_reply = new CommentCardReply(this, geoPostObj);
 //            cards.add(card_reply);
 //        }
         getComments();
