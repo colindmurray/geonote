@@ -10,9 +10,13 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 
 public class DispatchActivity extends ActionBarActivity {
     public static final String TAG = "Parse Dispatch";
+    private static boolean parse_init = false;
+
     public DispatchActivity(){
 
     }
@@ -20,8 +24,12 @@ public class DispatchActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
+        JodaTimeAndroid.init(this);
+        if (!parse_init) {
+            Parse.enableLocalDatastore(this);
+            Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
+            parse_init = true;
+        }
         if (ParseUser.getCurrentUser() != null){
             String user = ParseUser.getCurrentUser().getUsername();
             Log.e(TAG, "Current user: " + user);

@@ -7,10 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.LocalDateTime;
+import org.joda.time.Minutes;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
@@ -32,11 +35,23 @@ public class CommentActivity extends ActionBarActivity {
         ArrayList<Card> cards = new ArrayList<>();
         CommentCardHeader card = new CommentCardHeader(this, geoPostObj);
         cards.add(card);
+
         Date currentDate = geoPostObj.getCreatedAt();
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.US);
-        String time = format.format(currentDate);
-        Log.e(TAG, "Simpledate Format: " + time);
-        Log.e(TAG, "Hours is: " + currentDate.getHours());
+        //JodaTime is amazing!
+        LocalDateTime dateTime = new LocalDateTime(currentDate);
+        LocalDateTime currentTime = new LocalDateTime();
+        int numdays = Days.daysBetween(dateTime, currentTime).getDays();
+        int numHours = Hours.hoursBetween(dateTime, currentTime).getHours();
+        int numMinutes = Minutes.minutesBetween(dateTime, currentTime).getMinutes();
+        if (numdays > 0){
+            Log.e(TAG, "Number of days: " + numdays);
+        }
+        else if (numHours > 0){
+            Log.e(TAG, "Number of hours difference is: " + numHours);
+        }
+        else{
+            Log.e(TAG, "Number of minutes is: " + numMinutes);
+        }
 
         for (int i = 0; i < 15; i++) {
             CommentCardReply card_reply = new CommentCardReply(this, geoPostObj);

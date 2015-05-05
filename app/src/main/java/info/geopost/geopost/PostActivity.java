@@ -39,7 +39,7 @@ public class PostActivity extends ActionBarActivity {
     private SharedPreferences mPrefs;
     private Boolean mObscureLocation;
 
-    private Double weight = 0.004;
+    private Double weight = 0.002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
