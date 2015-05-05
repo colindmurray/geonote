@@ -36,4 +36,5 @@ dependencies {
     compile 'com.github.gabrielemariotti.cards:cardslib-recyclerview:2.0.1'
     compile 'com.afollestad:material-dialogs:0.7.2.8'
     compile 'com.nineoldandroids:library:2.4.+'
+    compile 'net.danlew:android.joda:2.7.2'
 }

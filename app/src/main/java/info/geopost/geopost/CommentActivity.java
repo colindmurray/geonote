@@ -7,7 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
@@ -29,7 +32,11 @@ public class CommentActivity extends ActionBarActivity {
         ArrayList<Card> cards = new ArrayList<>();
         CommentCardHeader card = new CommentCardHeader(this, geoPostObj);
         cards.add(card);
-        Log.e(TAG, geoPostObj.getText());
+        Date currentDate = geoPostObj.getCreatedAt();
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.US);
+        String time = format.format(currentDate);
+        Log.e(TAG, "Simpledate Format: " + time);
+        Log.e(TAG, "Hours is: " + currentDate.getHours());
 
         for (int i = 0; i < 15; i++) {
             CommentCardReply card_reply = new CommentCardReply(this, geoPostObj);
