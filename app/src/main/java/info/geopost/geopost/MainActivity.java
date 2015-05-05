@@ -170,9 +170,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
                     case 0:
                         break;
                     case 1:
-//                        TextView tv2 = (TextView) view;
-//                        tv2.setText("Test: " + ParseUser.getCurrentUser().getUsername());
-//                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
                         TextView tv3 = (TextView) view;
