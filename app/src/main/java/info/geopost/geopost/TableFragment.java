@@ -21,12 +21,11 @@ import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import it.gmariotti.cardslib.library.view.CardListView;
 
 
-public class  TableFragment extends Fragment implements FragmentInteractionInterface, CurrentVoteGetterSetter{
+public class  TableFragment extends Fragment implements FragmentInteractionInterface {
 
     private final String TAG = getTag();
     private LatLng mCurrentLocation;
     private MainActivityInteractionInterface mMainActivity;
-    private int mCurrentVote;
     ArrayList<Card> mCardsArray = new ArrayList<>();
     HashSet<String> mPostsSet = new HashSet<>();
     CardArrayAdapter mCardArrayAdapter;
@@ -89,7 +88,7 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
         for (GeoPostObj post : geoPostObjList) {
             if(!mPostsSet.contains(post.getObjectId())) {
                 mPostsSet.add(post.getObjectId());
-                GeoCard card = new GeoCard(getActivity(), post, mMainActivity.getUserData(), this);
+                GeoCard card = new GeoCard(getActivity(), post, mMainActivity.getUserData());
                 card.setOnClickListener(new Card.OnCardClickListener() {
                     @Override
                     public void onClick(Card card, View view) {
@@ -109,13 +108,4 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
         mCurrentLocation = currentLocation;
     }
 
-    @Override
-    public int getCurrentVote() {
-        return mCurrentVote;
-    }
-
-    @Override
-    public void setCurrentVote(int vote) {
-        mCurrentVote = vote;
-    }
 }

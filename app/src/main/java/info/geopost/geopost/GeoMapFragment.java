@@ -1,14 +1,9 @@
 package info.geopost.geopost;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -19,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.gc.materialdesign.views.ButtonFloat;
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -31,10 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
-
-import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,7 +40,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     // Dialog attributes
     private MaterialDialog mMaterialDialog;
     private com.rey.material.widget.FloatingActionButton mDownVoteButton;
-    private com.rey.material.widget.FloatingActionButton mUpvoteButton;
+    private com.rey.material.widget.FloatingActionButton mUpVoteButton;
     private TextView mModalUserName;
     private TextView mModalVoteRatio;
     private TextView mModalTextBody;
@@ -78,6 +68,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private Drawable upvote_unpressed;
     private Drawable downvote_unpressed;
     private int mLastVote;
+    private VoteButtonLogic mVoteButtonLogic;
 
 
     /**
@@ -142,23 +133,19 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                     public void onShow(DialogInterface dialog) {
 //                        setModalVoteStatus(mCurrentVote);
 
-                        updateModalVoteStatus(mCurrentVote, mLastVote, true);
+                        mVoteButtonLogic.updateModalVoteStatusButtonBackground(mCurrentVote, mLastVote);
                     }
                 }).cancelable(true).build();
         mMaterialDialog.setCanceledOnTouchOutside(true);
         mModalUserName = (TextView) mMaterialDialog.findViewById(R.id.postUserNameTextView);
         mModalTextBody = (TextView) mMaterialDialog.findViewById(R.id.postTextBody);
         mModalVoteRatio = (TextView) mMaterialDialog.findViewById(R.id.voteRatioTextView);
-        mUpvoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.upvote_button);
-        mUpvoteButton.setOnClickListener(mUpvoteClickListener);
+        mUpVoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.upvote_button);
+        mUpVoteButton.setOnClickListener(mUpvoteClickListener);
         mDownVoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.downvote_button);
         mDownVoteButton.setOnClickListener(mDownvoteClickListener);
         mLastVote = 0;
-
-        upvote_pressed = getResources().getDrawable(R.drawable.up_vote);
-        downvote_pressed = getResources().getDrawable(R.drawable.down_vote);
-        upvote_unpressed = getResources().getDrawable(R.drawable.up_vote_unpressed);
-        downvote_unpressed = getResources().getDrawable(R.drawable.down_vote_unpressed);
+        mVoteButtonLogic = new VoteButtonLogic(getActivity(), mUpVoteButton, mDownVoteButton);
 
         MapView view = (MapView) v.findViewById(R.id.map);
         view.onCreate(savedInstanceState);
@@ -386,13 +373,6 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
             @Override
             public void onFinish() {
                 mMaterialDialog.show();
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-//                        Log.d(TAG, "setting vote: " + mCurrentVote);
-//                        updateModalVoteStatus(-mCurrentVote, mCurrentVote, true);
-                    }
-                }, 3000);
             }
 
             @Override
@@ -405,48 +385,6 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         return true;
     }
 
-    private void setModalVoteStatus(int voteStatus) {
-        switch(voteStatus) {
-            case 1:
-                mUpvoteButton.setIcon(upvote_pressed, false); //getResources().getDrawable(R.drawable.up_vote), true);
-                mDownVoteButton.setIcon(downvote_unpressed, false); //getResources().getDrawable(R.drawable.down_vote_unpressed), true);
-                break;
-            case -1:
-                mUpvoteButton.setIcon(upvote_unpressed, false); //getResources().getDrawable(R.drawable.up_vote_unpressed), true);
-                mDownVoteButton.setIcon(downvote_pressed, false); //getResources().getDrawable(R.drawable.down_vote), true);
-                break;
-            case 0:
-                mUpvoteButton.setIcon(upvote_unpressed, false); //getResources().getDrawable(R.drawable.up_vote_unpressed), true);
-                mDownVoteButton.setIcon(downvote_unpressed, false); //getResources().getDrawable(R.drawable.down_vote_unpressed), true);
-                break;
-            default:
-                mUpvoteButton.setIcon(upvote_unpressed, false); //getResources().getDrawable(R.drawable.up_vote_unpressed), true);
-                mDownVoteButton.setIcon(downvote_unpressed, false); //getResources().getDrawable(R.drawable.down_vote_unpressed), true );
-                break;
-        }
-    }
-    private void updateModalVoteStatus(int voteStatus, int currentVoteStatus, boolean animation) {
-        if(voteStatus == currentVoteStatus) {
-            return;
-        } else if (voteStatus == 1 && currentVoteStatus == -1) {
-            mUpvoteButton.setIcon(upvote_pressed, animation);
-            mDownVoteButton.setIcon(downvote_unpressed, animation);
-        } else if (voteStatus == -1 && currentVoteStatus == 1) {
-            mUpvoteButton.setIcon(upvote_unpressed, animation);
-            mDownVoteButton.setIcon(downvote_pressed, animation);
-        } else if (voteStatus == 0 && currentVoteStatus == 1) {
-            mUpvoteButton.setIcon(upvote_unpressed, animation);
-        } else if (voteStatus == 0 && currentVoteStatus == -1) {
-            mDownVoteButton.setIcon(downvote_unpressed, animation);
-        } else if (voteStatus == 1) {
-            mUpvoteButton.setIcon(upvote_pressed, animation);
-        } else if (voteStatus == -1) {
-            mDownVoteButton.setIcon(downvote_pressed, animation);
-        } else {
-            mUpvoteButton.setIcon(upvote_unpressed, animation);
-            mDownVoteButton.setIcon(downvote_unpressed, animation);
-        }
-    }
 
     private View.OnClickListener mUpvoteClickListener = new View.OnClickListener() {
         @Override
@@ -454,12 +392,12 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
             Log.d(TAG, "Upvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
             if(mCurrentVote != GeoPostObj.UPVOTE) {
                 GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.UPVOTE);
-                updateModalVoteStatus(GeoPostObj.UPVOTE, mCurrentVote, true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.UPVOTE, mCurrentVote);
                 mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
                 mCurrentVote = GeoPostObj.UPVOTE;
             } else {
                 GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.NOVOTE);
-                updateModalVoteStatus(GeoPostObj.NOVOTE, mCurrentVote, true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.NOVOTE, mCurrentVote);
                 mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
                 mCurrentVote = GeoPostObj.NOVOTE;
             }
@@ -472,12 +410,12 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
             Log.d(TAG, "Downvoting post: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
             if(mCurrentVote != GeoPostObj.DOWNVOTE) {
                 GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.DOWNVOTE);
-                updateModalVoteStatus(GeoPostObj.DOWNVOTE, mCurrentVote, true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.DOWNVOTE, mCurrentVote);
                 mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
                 mCurrentVote = GeoPostObj.DOWNVOTE;
             } else {
                 GeoPostObj.updateVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj, GeoPostObj.NOVOTE);
-                updateModalVoteStatus(GeoPostObj.NOVOTE, mCurrentVote, true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.NOVOTE, mCurrentVote);
                 mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
                 mCurrentVote = GeoPostObj.NOVOTE;
             }

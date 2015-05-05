@@ -33,4 +33,8 @@
     <color name="colorControlActivated">#FF03A9F4</color>
     <color name="colorSwitchThumbNormal">#FF78909C</color>
 
+    <color name="downVoteColor">#CC0000</color>
+    <color name="upVoteColor">#00CC00</color>
+    <color name="noVoteColor">#ffe7e7e7</color>
+
 </resources>

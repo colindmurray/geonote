@@ -24,32 +24,27 @@ public class GeoCard extends Card
     protected GeoPostObj mGeoPostObj;
     private FloatingActionButton mUpvoteButton;
     private FloatingActionButton mDownvoteButton;
-    private Drawable upvote_pressed;
-    private Drawable downvote_pressed;
-    private Drawable upvote_unpressed;
-    private Drawable downvote_unpressed;
-//    private int mCurrentVote;
-    private int mLastVote;
     private TextView mVoteRatio;
-    private CurrentVoteGetterSetter mCurrentVote;
+    private int mCurrentVote;
+    private VoteButtonLogic mVoteButtonLogic;
 
     public GeoPostObj getmGeoPostObj() {
         return mGeoPostObj;
     }
 
-    public GeoCard(Context context, GeoPostObj geoPostObj, ParseObject userData, CurrentVoteGetterSetter currentVote) {
+    public GeoCard(Context context, GeoPostObj geoPostObj, ParseObject userData) {
         super(context, R.layout.card_layout);
         mGeoPostObj = geoPostObj;
         mUserData = userData;
-        mCurrentVote = currentVote;
+        mCurrentVote = GeoPostObj.getVoteStatus(userData, geoPostObj);
         initialize();
     }
 
-    public GeoCard(Context context, GeoPostObj geoPostObj, int innerLayout, ParseObject userData, CurrentVoteGetterSetter currentVote) {
+    public GeoCard(Context context, GeoPostObj geoPostObj, int innerLayout, ParseObject userData) {
         super(context, innerLayout);
         mGeoPostObj = geoPostObj;
         mUserData = userData;
-        mCurrentVote = currentVote;
+        mCurrentVote = GeoPostObj.getVoteStatus(userData, geoPostObj);
         initialize();
     }
 
@@ -64,9 +59,6 @@ public class GeoCard extends Card
 
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view) {
-        mLastVote = mCurrentVote.getCurrentVote();
-        mCurrentVote.setCurrentVote(GeoPostObj.getVoteStatus(mUserData, mGeoPostObj));
-
         mTitle = (TextView) parent.findViewById(R.id.textView);
         mUsername = (TextView) parent.findViewById(R.id.usernameCard);
         mVoteRatio = (TextView) parent.findViewById(R.id.voteRatioTextView);
@@ -78,12 +70,9 @@ public class GeoCard extends Card
         mDownvoteButton = (FloatingActionButton) parent.findViewById(R.id.card_downvote_button);
         mDownvoteButton.setOnClickListener(mDownvoteClickListener);
 
-        upvote_pressed = parent.getResources().getDrawable(R.drawable.up_vote);
-        downvote_pressed = parent.getResources().getDrawable(R.drawable.down_vote);
-        upvote_unpressed = parent.getResources().getDrawable(R.drawable.up_vote_unpressed);
-        downvote_unpressed = parent.getResources().getDrawable(R.drawable.down_vote_unpressed);
+        mVoteButtonLogic = new VoteButtonLogic(parent.getContext(), mUpvoteButton, mDownvoteButton);
 
-        updateModalVoteStatus(mCurrentVote.getCurrentVote(), mLastVote, true);
+        mVoteButtonLogic.setModalVoteStatusBackground(mCurrentVote);
 
     }
 
@@ -92,16 +81,16 @@ public class GeoCard extends Card
         @Override
         public void onClick(View v) {
             Log.d(TAG, "Upvoting post: " + mGeoPostObj.getObjectId());
-            if(mCurrentVote.getCurrentVote() != GeoPostObj.UPVOTE) {
+            if(mCurrentVote != GeoPostObj.UPVOTE) {
                 GeoPostObj.updateVoteStatus(mUserData, mGeoPostObj, GeoPostObj.UPVOTE);
-                updateModalVoteStatus(GeoPostObj.UPVOTE, mCurrentVote.getCurrentVote(), true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.UPVOTE, mCurrentVote);
                 mVoteRatio.setText("" + mGeoPostObj.getVotes());
-                mCurrentVote.setCurrentVote(GeoPostObj.UPVOTE);
+                mCurrentVote = GeoPostObj.UPVOTE;
             } else {
                 GeoPostObj.updateVoteStatus(mUserData, mGeoPostObj, GeoPostObj.NOVOTE);
-                updateModalVoteStatus(GeoPostObj.NOVOTE, mCurrentVote.getCurrentVote(), true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.NOVOTE, mCurrentVote);
                 mVoteRatio.setText("" + mGeoPostObj.getVotes());
-                mCurrentVote.setCurrentVote(GeoPostObj.NOVOTE);
+                mCurrentVote = GeoPostObj.NOVOTE;
             }
         }
     };
@@ -110,40 +99,18 @@ public class GeoCard extends Card
         @Override
         public void onClick(View v) {
             Log.d(TAG, "Downvoting post: " + mGeoPostObj.getObjectId());
-            if(mCurrentVote.getCurrentVote() != GeoPostObj.DOWNVOTE) {
+            if(mCurrentVote != GeoPostObj.DOWNVOTE) {
                 GeoPostObj.updateVoteStatus(mUserData, mGeoPostObj, GeoPostObj.DOWNVOTE);
-                updateModalVoteStatus(GeoPostObj.DOWNVOTE, mCurrentVote.getCurrentVote(), true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.DOWNVOTE, mCurrentVote);
                 mVoteRatio.setText("" + mGeoPostObj.getVotes());
-                mCurrentVote.setCurrentVote(GeoPostObj.DOWNVOTE);
+                mCurrentVote = GeoPostObj.DOWNVOTE;
             } else {
                 GeoPostObj.updateVoteStatus(mUserData, mGeoPostObj, GeoPostObj.NOVOTE);
-                updateModalVoteStatus(GeoPostObj.NOVOTE, mCurrentVote.getCurrentVote(), true);
+                mVoteButtonLogic.updateModalVoteStatusButtonBackground(GeoPostObj.NOVOTE, mCurrentVote);
                 mVoteRatio.setText("" + mGeoPostObj.getVotes());
-                mCurrentVote.setCurrentVote(GeoPostObj.NOVOTE);
+                mCurrentVote = GeoPostObj.NOVOTE;
             }
         }
     };
 
-    private void updateModalVoteStatus(int voteStatus, int currentVoteStatus, boolean animation) {
-        if(voteStatus == currentVoteStatus) {
-            return;
-        } else if (voteStatus == 1 && currentVoteStatus == -1) {
-            mUpvoteButton.setIcon(upvote_pressed, animation);
-            mDownvoteButton.setIcon(downvote_unpressed, animation);
-        } else if (voteStatus == -1 && currentVoteStatus == 1) {
-            mUpvoteButton.setIcon(upvote_unpressed, animation);
-            mDownvoteButton.setIcon(downvote_pressed, animation);
-        } else if (voteStatus == 0 && currentVoteStatus == 1) {
-            mUpvoteButton.setIcon(upvote_unpressed, animation);
-        } else if (voteStatus == 0 && currentVoteStatus == -1) {
-            mDownvoteButton.setIcon(downvote_unpressed, animation);
-        } else if (voteStatus == 1) {
-            mUpvoteButton.setIcon(upvote_pressed, animation);
-        } else if (voteStatus == -1) {
-            mDownvoteButton.setIcon(downvote_pressed, animation);
-        } else {
-            mUpvoteButton.setIcon(upvote_unpressed, animation);
-            mDownvoteButton.setIcon(downvote_unpressed, animation);
-        }
-    }
 }

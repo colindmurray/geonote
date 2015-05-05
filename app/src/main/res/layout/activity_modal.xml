@@ -95,7 +95,7 @@
                 app:fab_iconSrc="@drawable/down_vote_unpressed"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="5dp"
-                app:fab_backgroundColor="#ffffff"/>
+                app:fab_backgroundColor="@color/noVoteColor"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -114,7 +114,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fab_iconSrc="@drawable/up_vote_unpressed"
-                app:fab_backgroundColor="#ffffff"
+                app:fab_backgroundColor="@color/noVoteColor"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/voteRatioTextView"
                 android:layout_toEndOf="@+id/voteRatioTextView"
