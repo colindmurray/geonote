@@ -60,7 +60,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     // Set map to current user location on first location event.
     private MainActivityInteractionInterface mMainActivity;
-    private boolean mZoomOnFirstLocationEvent = false;
+    private boolean mZoomOnFirstLocationEvent = true;
     private int mCurrentVote = 0;
 
     private Drawable upvote_pressed;
@@ -209,22 +209,22 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         @Override
         public void onMyLocationChange(Location location) {
             // Updates current location in this, MainActivity, and other fragments.
-            boolean noLocationZoomMap = (mCurrentLocation.latitude == 0.0 && mCurrentLocation.longitude == 0.0);
             Log.e(TAG, "Location: " + mCurrentLocation.longitude + " " + mCurrentLocation.latitude);
             mMainActivity.broadcastNewLocation(new LatLng(location.getLatitude(), location.getLongitude()));
-            if(noLocationZoomMap) {
-                CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
-                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
-            }
-            // Backup if location isn't determined before this event.
             if(mZoomOnFirstLocationEvent) {
                 CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
-                Log.d(TAG, "Moving camera position to:\n" +
-                        "curLat: " + mCurrentLocation.latitude +
-                        " curLon: " + mCurrentLocation.longitude);
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
                 mZoomOnFirstLocationEvent = false;
             }
+            // Backup if location isn't determined before this event.
+//            if(mZoomOnFirstLocationEvent) {
+//                CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
+//                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
+//                Log.d(TAG, "Moving camera position to:\n" +
+//                        "curLat: " + mCurrentLocation.latitude +
+//                        " curLon: " + mCurrentLocation.longitude);
+//                mZoomOnFirstLocationEvent = false;
+//            }
 
             Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
 
