@@ -221,6 +221,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         Criteria criteria = new Criteria();
 
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+        Log.e(TAG, "Location: " + location.toString());
         if (location != null) {
             setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
         }

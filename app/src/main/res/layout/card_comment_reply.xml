@@ -11,7 +11,7 @@
         android:id="@+id/card_main_content_layout"
         style="@style/card.native.content_outer_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="130dp"
         android:paddingLeft="30dp"
         android:orientation="horizontal">
 
@@ -27,7 +27,8 @@
             android:text="Colin's mom has got it going on"
             android:id="@+id/commentBody"
             android:layout_gravity="left|top"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/replyusername" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -43,8 +44,9 @@
                 android:layout_height="wrap_content"
                 android:text="1 hour ago"
                 android:id="@+id/replytime"
-                android:layout_alignBottom="@+id/replyusername"
-                android:layout_centerHorizontal="true" />
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
             <View
                 android:id="@+id/separatorCard"
