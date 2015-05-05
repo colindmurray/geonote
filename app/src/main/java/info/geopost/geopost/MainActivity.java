@@ -27,6 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -46,7 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements ToolbarManager.OnToolbarGroupChangedListener, MainActivityInteractionInterface {
+public class MainActivity extends ActionBarActivity implements ToolbarManager.OnToolbarGroupChangedListener, MainActivityInteractionInterface,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -94,6 +98,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private Boolean mObscureLocation;
     public SharedPreferences mPrefs;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,11 +226,14 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         Criteria criteria = new Criteria();
 
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
-        Log.e(TAG, "Location: " + location.toString());
+        buildGoogleApiClient();
         if (location != null) {
+            Log.e(TAG, "Location: " + location.toString());
             setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+        } else {
+            Log.e(TAG, "Null location!");
         }
-
+//        onConnected(null);
         doParseQuery(null);
 
     }
@@ -355,6 +363,36 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private LatLng latLngFromParseGeoPoint(ParseGeoPoint point) {
         return new LatLng(point.getLatitude(), point.getLongitude());
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            Log.e(TAG, String.valueOf(mLastLocation.getLatitude()));
+            Log.e(TAG, String.valueOf(mLastLocation.getLongitude()));
+        } else {
+            Log.e(TAG, "NUKJKSDHFKJSDFH");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "ERROR!!!!");
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
 

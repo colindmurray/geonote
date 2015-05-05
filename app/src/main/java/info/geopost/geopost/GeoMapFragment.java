@@ -209,8 +209,13 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         @Override
         public void onMyLocationChange(Location location) {
             // Updates current location in this, MainActivity, and other fragments.
+            boolean noLocationZoomMap = (mCurrentLocation.latitude == 0.0 && mCurrentLocation.longitude == 0.0);
+            Log.e(TAG, "Location: " + mCurrentLocation.longitude + " " + mCurrentLocation.latitude);
             mMainActivity.broadcastNewLocation(new LatLng(location.getLatitude(), location.getLongitude()));
-
+            if(noLocationZoomMap) {
+                CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+            }
             // Backup if location isn't determined before this event.
             if(mZoomOnFirstLocationEvent) {
                 CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
