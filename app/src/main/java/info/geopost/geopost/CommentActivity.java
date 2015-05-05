@@ -5,9 +5,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.LocalDateTime;
+import org.joda.time.Minutes;
 
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -33,25 +36,30 @@ public class CommentActivity extends ActionBarActivity {
     private TextView body;
     private final String TAG = "CommentActivity";
 
-    CardArrayAdapter mCardArrayAdapter;
-    CardListView mListView;
-    private Button mPostButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        mPostButton = (Button) findViewById(R.id.comment_button);
-        mPostButton.setOnClickListener(mPostButtonClickListener);
         ArrayList<Card> cards = new ArrayList<>();
         CommentCardHeader card = new CommentCardHeader(this, geoPostObj);
         cards.add(card);
         Date currentDate = geoPostObj.getCreatedAt();
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.US);
-        String time = format.format(currentDate);
-        Log.e(TAG, "Simpledate Format: " + time);
-        Log.e(TAG, "Hours is: " + currentDate.getHours());
+        //JodaTime is amazing!
+        LocalDateTime dateTime = new LocalDateTime(currentDate);
+        LocalDateTime currentTime = new LocalDateTime();
+        int numdays = Days.daysBetween(dateTime, currentTime).getDays();
+        int numHours = Hours.hoursBetween(dateTime, currentTime).getHours();
+        int numMinutes = Minutes.minutesBetween(dateTime, currentTime).getMinutes();
+        if (numdays > 0){
+            Log.e(TAG, "Number of days: " + numdays);
+        }
+        else if (numHours > 0){
+            Log.e(TAG, "Number of hours difference is: " + numHours);
+        }
+        else{
+            Log.e(TAG, "Number of minutes is: " + numMinutes);
+        }
 
         mCardArrayAdapter = new CardArrayAdapter(this, cards);
 
@@ -109,11 +117,4 @@ public class CommentActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    private View.OnClickListener mPostButtonClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-        }
-    };
 }
