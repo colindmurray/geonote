@@ -39,4 +39,6 @@
     <string name="hide">hide</string>
     <string name="title_activity_comment">CommentActivity</string>
 
+    <string name="parse_object_comment">CommentObj</string>
+
 </resources>

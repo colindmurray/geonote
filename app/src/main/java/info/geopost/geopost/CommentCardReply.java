@@ -2,6 +2,8 @@ package info.geopost.geopost;
 
 import android.content.Context;
 
+import com.parse.ParseObject;
+
 import it.gmariotti.cardslib.library.internal.Card;
 
 /**
@@ -10,9 +12,11 @@ import it.gmariotti.cardslib.library.internal.Card;
 public class CommentCardReply extends Card
 {
     private final GeoPostObj mGeoPostObj;
+    private final GeoCommentObj mComment;
 
-    public CommentCardReply(Context context, GeoPostObj mGeoPostObj) {
+    public CommentCardReply(Context context, GeoPostObj geoPostObj, GeoCommentObj comment) {
         super(context, R.layout.card_comment_reply);
-        this.mGeoPostObj = mGeoPostObj;
+        mGeoPostObj = geoPostObj;
+        mComment = comment;
     }
 }
