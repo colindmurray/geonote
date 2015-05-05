@@ -35,6 +35,8 @@ public class CommentActivity extends ActionBarActivity {
     private TextView username;
     private TextView body;
     private final String TAG = "CommentActivity";
+    private CardArrayAdapter mCardArrayAdapter;
+    private CardListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class CommentActivity extends ActionBarActivity {
         getComments();
     }
 
-    public CommentCardReply getReplyCard(ParseObject comment) {
+    public CommentCardReply getReplyCard(GeoCommentObj comment) {
         return  new CommentCardReply(this, geoPostObj, comment);
     }
 
@@ -86,7 +88,7 @@ public class CommentActivity extends ActionBarActivity {
             public void done(List<GeoCommentObj> commentList, ParseException e) {
                 if (e == null) {
                     Log.d(TAG, "Retrieved " + commentList.size() + " comments");
-                    for(ParseObject comment : commentList) {
+                    for(GeoCommentObj comment : commentList) {
                         mCardArrayAdapter.add(getReplyCard(comment));
                     }
                 } else {
