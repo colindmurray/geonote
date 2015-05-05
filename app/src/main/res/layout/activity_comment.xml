@@ -15,12 +15,12 @@
         android:layout_height="match_parent"
         android:id="@+id/commentList"
         card:list_card_layout_resourceID="@layout/native_list_card_layout"
-        android:layout_above="@+id/editText" />
+        android:layout_above="@+id/replyEditText" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/replyEditText"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:text="Post"
         android:id="@+id/comment_button"
-        android:layout_alignTop="@+id/editText"
+        android:layout_alignTop="@+id/replyEditText"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:background="@android:color/transparent" />

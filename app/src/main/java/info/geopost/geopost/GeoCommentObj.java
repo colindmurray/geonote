@@ -8,13 +8,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 
-@ParseClassName("GeoPostObj")
+@ParseClassName("GeoCommentObj")
 public class GeoCommentObj extends ParseObject {
     private static final String TAG = GeoCommentObj.class.getSimpleName();
-
-    public static final int DOWNVOTE = -1;
-    public static final int UPVOTE = 1;
-    public static final int NOVOTE = 0;
 
     public GeoCommentObj() {
     }

@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -93,8 +92,10 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
                     @Override
                     public void onClick(Card card, View view) {
                         Intent intent = new Intent(getActivity(), CommentActivity.class);
+                        LatLng myLoc = mCurrentLocation;
+                        intent.putExtra(MainActivity.INTENT_EXTRA_LOCATION, myLoc);
                         GeoCard geoCard = (GeoCard) card;
-                        CommentActivity.geoPostObj = geoCard.getmGeoPostObj();
+                        CommentActivity.mGeoPostObj = geoCard.getmGeoPostObj();
                         startActivity(intent);
                     }
                 });

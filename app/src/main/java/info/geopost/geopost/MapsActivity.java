@@ -448,8 +448,8 @@ public class MapsActivity extends ActionBarActivity
 //        MarkerOptions markerOpts =
 //                new MarkerOptions().position(loc);
 //        markerOpts =
-//                markerOpts.title(geoPostMarker.geoPostObj.getText())
-//                        .snippet(geoPostMarker.geoPostObj.getUser().getUsername())
+//                markerOpts.title(geoPostMarker.mGeoPostObj.getText())
+//                        .snippet(geoPostMarker.mGeoPostObj.getUser().getUsername())
 //                        .icon(BitmapDescriptorFactory.defaultMarker(
 //                                BitmapDescriptorFactory.HUE_GREEN));
 //        return
