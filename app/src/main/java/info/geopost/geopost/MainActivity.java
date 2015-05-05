@@ -231,6 +231,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private void setupParse() {
         ParseObject.registerSubclass(GeoPostObj.class);
+        ParseObject.registerSubclass(GeoCommentObj.class);
     }
 
     @Override

@@ -40,5 +40,6 @@
     <string name="title_activity_comment">CommentActivity</string>
 
     <string name="parse_object_comment">CommentObj</string>
+    <string name="replyToastMessage">Reply success!!!</string>
 
 </resources>
