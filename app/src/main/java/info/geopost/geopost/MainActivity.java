@@ -2,6 +2,7 @@ package info.geopost.geopost;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -22,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -50,7 +52,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     // Used to pass location from MainActivity to PostActivity
     public static final String INTENT_EXTRA_LOCATION = "location";
-
+    public static final String OBSCURE_CURRENT_LOCATION = "obscure_location";
 
     public static final int MAX_POST_SEARCH_DISTANCE = 300;
     public static final int MAX_POST_SEARCH_RESULTS = 75;
@@ -90,11 +92,16 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 
     private FloatingActionButton mPostButton;
 
+    private Boolean mObscureLocation;
+    public SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mObscureLocation = ParseUser.getCurrentUser().getBoolean(OBSCURE_CURRENT_LOCATION);
 
         setupParse();
         fl_drawer = (FrameLayout)findViewById(R.id.main_fl_drawer);
@@ -109,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         mToolbarManager.setNavigationManager(new ToolbarManager.BaseNavigationManager(R.style.NavigationDrawerDrawable, this, mToolbar, dl_navigator) {
             @Override
             public void onNavigationClick() {
-                if(mToolbarManager.getCurrentGroup() != 0)
+                if (mToolbarManager.getCurrentGroup() != 0)
                     mToolbarManager.setCurrentGroup(0);
                 else
                     dl_navigator.openDrawer(Gravity.START);
@@ -128,10 +135,12 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         });
         mToolbarManager.registerOnToolbarGroupChangedListener(this);
 
-        String [] navNames = new String[3];
+        String [] navNames = new String[4];
         navNames[0] = ParseUser.getCurrentUser().getUsername();
         navNames[1] = "GeoPoints: " + geopoints;
-        navNames[2] = "Logout";
+        if (mObscureLocation){ navNames[2] = "Obscure Location: ON"; }
+        else{ navNames[2] = "Obscure Location: OFF"; }
+        navNames[3] = "Logout";
         ParseObject userDataPointer = ParseUser.getCurrentUser().getParseObject("UserData");
         if(userDataPointer == null) {
             mUserData = new ParseObject("UserData");
@@ -166,6 +175,14 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
 //                        Toast.makeText(getApplicationContext(),"Username: " + ParseUser.getCurrentUser().getUsername(), Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
+                        TextView tv3 = (TextView) view;
+                        mObscureLocation = !mObscureLocation;
+                        if (mObscureLocation){tv3.setText("Obscure Location: ON"); }
+                        else{ tv3.setText("Obscure Location: OFF"); }
+                        ParseUser.getCurrentUser().put(OBSCURE_CURRENT_LOCATION, mObscureLocation);
+                        ParseUser.getCurrentUser().saveInBackground();
+                        break;
+                    case 3:
                         logoutParseUser();
                         break;
                 }
