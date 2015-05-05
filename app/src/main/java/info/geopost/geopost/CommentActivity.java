@@ -7,22 +7,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import org.joda.time.Days;
-import org.joda.time.Hours;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Minutes;
-
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
@@ -46,22 +36,6 @@ public class CommentActivity extends ActionBarActivity {
         ArrayList<Card> cards = new ArrayList<>();
         CommentCardHeader card = new CommentCardHeader(this, geoPostObj);
         cards.add(card);
-        Date currentDate = geoPostObj.getCreatedAt();
-        //JodaTime is amazing!
-        LocalDateTime dateTime = new LocalDateTime(currentDate);
-        LocalDateTime currentTime = new LocalDateTime();
-        int numdays = Days.daysBetween(dateTime, currentTime).getDays();
-        int numHours = Hours.hoursBetween(dateTime, currentTime).getHours();
-        int numMinutes = Minutes.minutesBetween(dateTime, currentTime).getMinutes();
-        if (numdays > 0){
-            Log.e(TAG, "Number of days: " + numdays);
-        }
-        else if (numHours > 0){
-            Log.e(TAG, "Number of hours difference is: " + numHours);
-        }
-        else{
-            Log.e(TAG, "Number of minutes is: " + numMinutes);
-        }
 
         mCardArrayAdapter = new CardArrayAdapter(this, cards);
 

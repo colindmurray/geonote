@@ -22,6 +22,8 @@ public class CommentCardHeader extends Card
 {
     private final GeoPostObj mGeoPostObj;
     private TextView time;
+    private TextView username;
+    private TextView body;
 
     public CommentCardHeader(Context context, GeoPostObj mGeoPostObj) {
         super(context, R.layout.card_comment_header);
@@ -31,7 +33,13 @@ public class CommentCardHeader extends Card
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view) {
         super.setupInnerViewElements(parent, view);
+
         time = (TextView) parent.findViewById(R.id.time);
+        username = (TextView) parent.findViewById(R.id.comment_header_username);
+        body = (TextView) parent.findViewById(R.id.comment_header_text);
+        username.setText(mGeoPostObj.getUsername());
+        body.setText(mGeoPostObj.getText());
+
         Date currentDate = mGeoPostObj.getCreatedAt();
         //JodaTime is amazing!
         LocalDateTime dateTime = new LocalDateTime(currentDate);
