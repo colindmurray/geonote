@@ -39,12 +39,8 @@ import com.rey.material.app.ToolbarManager;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.TabPageIndicator;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -56,7 +52,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     public static final String INTENT_EXTRA_LOCATION = "location";
 
 
-    public static final int MAX_POST_SEARCH_DISTANCE = 100;
+    public static final int MAX_POST_SEARCH_DISTANCE = 300;
     public static final int MAX_POST_SEARCH_RESULTS = 75;
     public static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
 

@@ -1,13 +1,42 @@
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="info.geopost.geopost.CommentActivity">
 
     <it.gmariotti.cardslib.library.view.CardListView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:card="http://schemas.android.com/apk/res-auto"
         tools:context="info.geopost.geopost.CommentActivity"
-        android:background="#BBDEFB"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/commentList"
-        card:list_card_layout_resourceID="@layout/native_list_card_layout" />
+        card:list_card_layout_resourceID="@layout/native_list_card_layout"
+        android:layout_above="@+id/editText" />
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/comment_button"
+        android:maxLength="40"
+        android:layout_toStartOf="@+id/comment_button" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post"
+        android:id="@+id/comment_button"
+        android:layout_alignTop="@+id/editText"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent" />
+
+
+</RelativeLayout>

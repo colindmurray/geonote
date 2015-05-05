@@ -2,6 +2,7 @@ package info.geopost.geopost;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -26,9 +27,13 @@ public class CommentActivity extends ActionBarActivity {
         setContentView(R.layout.activity_comment);
 
         ArrayList<Card> cards = new ArrayList<>();
+        CommentCardHeader card = new CommentCardHeader(this, geoPostObj);
+        cards.add(card);
+        Log.e(TAG, geoPostObj.getText());
+
         for (int i = 0; i < 15; i++) {
-            CommentCardHeader card = new CommentCardHeader(this, geoPostObj);
-            cards.add(card);
+            CommentCardReply card_reply = new CommentCardReply(this, geoPostObj);
+            cards.add(card_reply);
         }
         CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(this,cards);
         CardListView listView = (CardListView) findViewById(R.id.commentList);

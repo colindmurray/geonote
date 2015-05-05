@@ -1,6 +1,5 @@
 package info.geopost.geopost;
 
-import android.os.UserHandle;
 import android.util.Log;
 
 import com.parse.ParseClassName;
@@ -11,8 +10,6 @@ import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 @ParseClassName("GeoPostObj")
 public class GeoPostObj extends ParseObject {

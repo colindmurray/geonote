@@ -12,28 +12,28 @@
         style="@style/card.native.content_outer_layout"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:paddingLeft="30dp"
         android:orientation="horizontal">
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/relativeLayout"
+            android:id="@+id/commentRealtiveLayout"
             android:layout_weight="1">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="81dp"
-                android:text="Colin's mom has got it going on"
-                android:id="@+id/textView"
-                android:layout_gravity="left|top"
-                android:layout_above="@+id/username"
-                android:layout_alignParentTop="true" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="81dp"
+            android:text="Colin's mom has got it going on"
+            android:id="@+id/commentBody"
+            android:layout_gravity="left|top"
+            android:layout_alignParentTop="true" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Jeremy"
-                android:id="@+id/username"
+                android:id="@+id/replyusername"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
@@ -42,19 +42,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1 hour ago"
-                android:id="@+id/time"
-                android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@+id/username"
-                android:layout_toEndOf="@+id/username"
-                android:layout_marginLeft="45dp"
-                android:layout_marginStart="45dp" />
+                android:id="@+id/replytime"
+                android:layout_alignBottom="@+id/replyusername"
+                android:layout_centerHorizontal="true" />
 
             <View
                 android:id="@+id/separatorCard"
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:background="@color/divider"
-                android:layout_above="@+id/username"
+                android:layout_above="@+id/replyusername"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
         </RelativeLayout>
@@ -97,6 +94,7 @@
                 android:layout_centerHorizontal="true" />
 
         </RelativeLayout>
+
     </LinearLayout>
 
     </it.gmariotti.cardslib.library.view.ForegroundLinearLayout>
