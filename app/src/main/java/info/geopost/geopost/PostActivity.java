@@ -2,6 +2,7 @@ package info.geopost.geopost;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -23,20 +24,29 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.Random;
+
 
 public class PostActivity extends ActionBarActivity {
 
+    public static final String OBSCURE_CURRENT_LOCATION = "obscure_location";
     private ButtonFlat mPostButton;
     private ParseGeoPoint mGeoPoint;
     private EditText mPostEditText;
     private EditText mTitleEditText;
     private TextView mCharacterCountTextView;
     private static final int MAX_CHARACTER_COUNT = 140;
+    private SharedPreferences mPrefs;
+    private Boolean mObscureLocation;
+
+    private Double weight = 0.004;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+
+        mObscureLocation = ParseUser.getCurrentUser().getBoolean(OBSCURE_CURRENT_LOCATION);
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.container, new PostFragment())
@@ -45,6 +55,18 @@ public class PostActivity extends ActionBarActivity {
         Intent intent = getIntent();
         LatLng location = intent.getParcelableExtra(MapsActivity.INTENT_EXTRA_LOCATION);
         mGeoPoint = new ParseGeoPoint(location.latitude, location.longitude);
+        if (mObscureLocation){
+            int latAdjust = new Random().nextInt(2);
+            int longAdjust = new Random().nextInt(2);
+            Double lat = mGeoPoint.getLatitude();
+            Double lon = mGeoPoint.getLongitude();
+            if (latAdjust == 0){ lat += weight; }
+            else{ lat -= weight; }
+            if (longAdjust == 0){ lon += weight;}
+            else{ lon -= weight; }
+            mGeoPoint.setLatitude(lat);
+            mGeoPoint.setLongitude(lon);
+        }
 
         mCharacterCountTextView = (TextView) findViewById(R.id.character_count_textview);
         mPostButton = (ButtonFlat) findViewById(R.id.post_button);
