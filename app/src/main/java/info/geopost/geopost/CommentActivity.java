@@ -17,9 +17,11 @@ import android.widget.Toast;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -41,9 +43,11 @@ public class CommentActivity extends ActionBarActivity {
     private CardArrayAdapter mCardArrayAdapter;
     private CardListView mListView;
     private ParseGeoPoint mGeoPoint;
+    private VoteCommentHolder mVoteCommentStatus;
 
     private ButtonFlat mPostButton;
     private EditText mReplyText;
+    private ParseObject mUserData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,21 +62,22 @@ public class CommentActivity extends ActionBarActivity {
         mPostButton.setOnClickListener(mPostButtonClickListener);
         mReplyText = (EditText) findViewById(R.id.replyEditText);
         ArrayList<Card> cards = new ArrayList<>();
-        CommentCardHeader card = new CommentCardHeader(this, mGeoPostObj);
-        cards.add(card);
-
         mCardArrayAdapter = new CardArrayAdapter(this, cards);
-
         mListView = (CardListView) findViewById(R.id.commentList);
         if (mListView!=null){
             mListView.setAdapter(mCardArrayAdapter);
         }
+        //Get user data to keep track of votes;
+        ParseObject userDataPointer = ParseUser.getCurrentUser().getParseObject("UserData");
+        userDataPointer.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+            public void done(ParseObject userData, ParseException e) {
+                mUserData = userData;
+                CommentCardHeader card = new CommentCardHeader(getApplicationContext(), mGeoPostObj, mUserData, mVoteCommentStatus);
+                mCardArrayAdapter.add(card);
+                getComments();
+            }
+        });
 
-//        for (int i = 0; i < 15; i++) {
-//            CommentCardReply card_reply = new CommentCardReply(this, geoPostObj);
-//            cards.add(card_reply);
-//        }
-        getComments();
     }
 
     public CommentCardReply getReplyCard(GeoCommentObj comment) {
@@ -84,6 +89,7 @@ public class CommentActivity extends ActionBarActivity {
         query.whereEqualTo("GeoPostObjPointer", mGeoPostObj);
         query.findInBackground(new FindCallback<GeoCommentObj>() {
             public void done(List<GeoCommentObj> commentList, ParseException e) {
+                mVoteCommentStatus.setCommentNumber(commentList.size());
                 if (e == null) {
                     Log.d(TAG, "Retrieved " + commentList.size() + " comments");
                     for(GeoCommentObj comment : commentList) {
@@ -141,6 +147,9 @@ public class CommentActivity extends ActionBarActivity {
             acl.setPublicWriteAccess(true);
             comment.setACL(acl);
             mCardArrayAdapter.add(getReplyCard(comment));
+            int numComments = mVoteCommentStatus.getCommentNumber() + 1;
+            mGeoPostObj.setCommentCount(numComments);
+            mVoteCommentStatus.setCommentNumber(numComments);
             comment.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
@@ -154,4 +163,14 @@ public class CommentActivity extends ActionBarActivity {
             hideKeyboard();
         }
     };
+
+    @Override
+    public void onBackPressed() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(VoteCommentHolder.VOTE_STATUS, mVoteCommentStatus.getVoteStatus());
+        resultIntent.putExtra(VoteCommentHolder.COMMENT_NUM, mVoteCommentStatus.getCommentNumber());
+        resultIntent.putExtra("GeoPostId", mGeoPostObj.getObjectId());
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
+    }
 }

@@ -216,15 +216,6 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
                 mZoomOnFirstLocationEvent = false;
             }
-            // Backup if location isn't determined before this event.
-//            if(mZoomOnFirstLocationEvent) {
-//                CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
-//                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
-//                Log.d(TAG, "Moving camera position to:\n" +
-//                        "curLat: " + mCurrentLocation.latitude +
-//                        " curLon: " + mCurrentLocation.longitude);
-//                mZoomOnFirstLocationEvent = false;
-//            }
 
             Log.d(TAG, "OnLocationChanged event - Lat: " + mCurrentLocation.latitude  +"Lon: " + mCurrentLocation.longitude);
 

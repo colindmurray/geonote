@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.ParseObject;
+import com.parse.ui.ParseLoginBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,7 +98,7 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
                         intent.putExtra(MainActivity.INTENT_EXTRA_LOCATION, myLoc);
                         GeoCard geoCard = (GeoCard) card;
                         CommentActivity.mGeoPostObj = geoCard.getmGeoPostObj();
-                        startActivity(intent);
+                        startActivityForResult(intent, 0);
                     }
                 });
                 mCardArrayAdapter.add(card);
@@ -107,6 +109,12 @@ public class  TableFragment extends Fragment implements FragmentInteractionInter
     @Override
     public void setCurrentLocation(LatLng currentLocation) {
         mCurrentLocation = currentLocation;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        Log.e(TAG, String.format("Request code is: %d and result code is: %d", requestCode, resultCode));
+
     }
 
 }

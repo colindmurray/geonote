@@ -230,11 +230,11 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         if (location != null) {
             Log.e(TAG, "Location: " + location.toString());
             setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+            doParseQuery(null);
         } else {
             Log.e(TAG, "Null location!");
         }
 //        onConnected(null);
-        doParseQuery(null);
 
     }
 
@@ -349,6 +349,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
             if(curLoc.distanceInKilometersTo(lastLoc) > DISTANCE_BEFORE_PARSE_UPDATE || ((System.currentTimeMillis() - mLastParseQueryTime) > PARSE_QUERY_TIMEOUT) ) {
                 doParseQuery(null);
             }
+        } else {
+            doParseQuery(null);
         }
     }
 
