@@ -12,7 +12,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.google.android.gms.maps.model.LatLng;
@@ -43,7 +42,7 @@ public class CommentActivity extends ActionBarActivity {
     private CardArrayAdapter mCardArrayAdapter;
     private CardListView mListView;
     private ParseGeoPoint mGeoPoint;
-    private VoteCommentHolder mVoteCommentStatus;
+    private VoteCommentHolder mVoteCommentStatus = new VoteCommentHolder();
 
     private ButtonFlat mPostButton;
     private EditText mReplyText;
