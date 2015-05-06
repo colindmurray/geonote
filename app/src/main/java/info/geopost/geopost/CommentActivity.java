@@ -43,7 +43,7 @@ public class CommentActivity extends ActionBarActivity {
     private CardArrayAdapter mCardArrayAdapter;
     private CardListView mListView;
     private ParseGeoPoint mGeoPoint;
-    private VoteCommentHolder mVoteCommentStatus;
+    private VoteCommentHolder mVoteCommentStatus = new VoteCommentHolder();
 
     private ButtonFlat mPostButton;
     private EditText mReplyText;
