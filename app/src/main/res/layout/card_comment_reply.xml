@@ -12,7 +12,7 @@
         style="@style/card.native.content_outer_layout"
         android:layout_width="match_parent"
         android:layout_height="130dp"
-        android:paddingLeft="30dp"
+        android:paddingLeft="40dp"
         android:orientation="horizontal">
 
         <RelativeLayout
