@@ -35,7 +35,8 @@
                 android:layout_alignParentStart="true"
                 android:textColor="@color/primary"
                 android:layout_marginLeft="10dp"
-                android:layout_marginBottom="3dp" />
+                android:layout_marginBottom="3dp"
+                android:gravity="center_horizontal" />
 
             <View
                 android:id="@+id/separator1"
@@ -54,6 +55,33 @@
                 android:textColor="@color/primary_text"
                 android:layout_below="@+id/postUserNameTextView"
                 android:layout_marginTop="10dp" />
+
+            <View
+                android:id="@+id/separator3"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_above="@+id/modalTime"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="23 hours ago."
+                android:id="@+id/modalTime"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comments: 9001"
+                android:id="@+id/modalComments"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
         </RelativeLayout>
 
         <View
@@ -141,7 +169,6 @@
             android:id="@+id/comments_button"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:text="@string/comments"
             android:textColor="@color/primary"
             android:drawableLeft="@drawable/comment"
             android:drawableStart="@drawable/comment"

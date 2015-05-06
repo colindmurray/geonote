@@ -28,6 +28,7 @@ public class GeoCard extends Card
     protected TextView mTitle;
     protected TextView mUsername;
     protected TextView time;
+    protected TextView mComments;
     protected GeoPostObj mGeoPostObj;
     private FloatingActionButton mUpvoteButton;
     private FloatingActionButton mDownvoteButton;
@@ -70,9 +71,11 @@ public class GeoCard extends Card
         mUsername = (TextView) parent.findViewById(R.id.usernameCard);
         mVoteRatio = (TextView) parent.findViewById(R.id.voteRatioTextView);
         time = (TextView) parent.findViewById(R.id.card_time);
+        mComments = (TextView) parent.findViewById(R.id.commentLabel);
         mVoteRatio.setText("" + mGeoPostObj.getVotes());
         mUsername.setText(mGeoPostObj.getUsername());
         mTitle.setText(mGeoPostObj.getText());
+        mComments.setText("Comments: " + mGeoPostObj.getCommentCount());
 
         Date currentDate = mGeoPostObj.getCreatedAt();
         //JodaTime is amazing!

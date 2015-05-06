@@ -21,6 +21,10 @@ public class GeoPostObj extends ParseObject {
 
     public GeoPostObj() {}
 
+    public int getCommentCount() {
+        return getInt("comment_count");
+    }
+
     public String getText() {
         return getString("text");
     }

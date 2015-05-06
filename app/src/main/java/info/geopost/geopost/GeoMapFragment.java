@@ -2,6 +2,7 @@ package info.geopost.geopost;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -26,6 +28,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.LocalDateTime;
+import org.joda.time.Minutes;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,9 +49,12 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     private MaterialDialog mMaterialDialog;
     private com.rey.material.widget.FloatingActionButton mDownVoteButton;
     private com.rey.material.widget.FloatingActionButton mUpVoteButton;
+    private Button mCommentButton;
     private TextView mModalUserName;
     private TextView mModalVoteRatio;
     private TextView mModalTextBody;
+    private TextView mModalComments;
+    private TextView time;
 
     private GeoPostMarker mSelectedGeoPostMarker;
     private Handler mDelayHandler = new Handler();
@@ -140,12 +151,26 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         mModalUserName = (TextView) mMaterialDialog.findViewById(R.id.postUserNameTextView);
         mModalTextBody = (TextView) mMaterialDialog.findViewById(R.id.postTextBody);
         mModalVoteRatio = (TextView) mMaterialDialog.findViewById(R.id.voteRatioTextView);
+        mModalComments = (TextView) mMaterialDialog.findViewById(R.id.modalComments);
+        time = (TextView) mMaterialDialog.findViewById(R.id.modalTime);
         mUpVoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.upvote_button);
         mUpVoteButton.setOnClickListener(mUpvoteClickListener);
         mDownVoteButton = (com.rey.material.widget.FloatingActionButton) mMaterialDialog.findViewById(R.id.downvote_button);
         mDownVoteButton.setOnClickListener(mDownvoteClickListener);
         mLastVote = 0;
         mVoteButtonLogic = new VoteButtonLogic(getActivity(), mUpVoteButton, mDownVoteButton);
+        mCommentButton = (Button) mMaterialDialog.findViewById(R.id.comments_button);
+        mCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "In onClick on comment button in modal");
+                Intent intent = new Intent(getActivity(), CommentActivity.class);
+                LatLng myLoc = mCurrentLocation;
+                intent.putExtra(MainActivity.INTENT_EXTRA_LOCATION, myLoc);
+                CommentActivity.mGeoPostObj = mSelectedGeoPostMarker.geoPostObj;
+                startActivity(intent);
+            }
+        });
 
         MapView view = (MapView) v.findViewById(R.id.map);
         view.onCreate(savedInstanceState);
@@ -209,7 +234,6 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         @Override
         public void onMyLocationChange(Location location) {
             // Updates current location in this, MainActivity, and other fragments.
-            Log.e(TAG, "Location: " + mCurrentLocation.longitude + " " + mCurrentLocation.latitude);
             mMainActivity.broadcastNewLocation(new LatLng(location.getLatitude(), location.getLongitude()));
             if(mZoomOnFirstLocationEvent) {
                 CameraPosition pos = new CameraPosition(mCurrentLocation, 16.0f, 0f, 0f);
@@ -368,6 +392,8 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         mModalUserName.setText(mSelectedGeoPostMarker.geoPostObj.getUser().getUsername());
         mModalTextBody.setText(mSelectedGeoPostMarker.geoPostObj.getText());
         mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+        mModalComments.setText("Comments: " + mSelectedGeoPostMarker.geoPostObj.getCommentCount());
+        setTime();
 
         // Zoom to marker click location
         float zoom = mMap.getCameraPosition().zoom;
@@ -428,5 +454,20 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
         }
     };
 
+    private void setTime(){
+        Date currentDate = mSelectedGeoPostMarker.geoPostObj.getCreatedAt();
+        //JodaTime is amazing!
+        LocalDateTime dateTime = new LocalDateTime(currentDate);
+        LocalDateTime currentTime = new LocalDateTime();
+        int numdays = Days.daysBetween(dateTime, currentTime).getDays();
+        int numHours = Hours.hoursBetween(dateTime, currentTime).getHours();
+        int numMinutes = Minutes.minutesBetween(dateTime, currentTime).getMinutes();
+        if (numdays > 0)
+            time.setText((numdays > 1) ? (numdays + " days ago.") : ("1 day ago."));
+        else if (numHours > 0)
+            time.setText((numHours > 1) ? (numHours + " hours ago.") : ("1 hour ago."));
+        else
+            time.setText((numMinutes > 1) ? (numMinutes + " minutes ago.") : ("1 minute ago."));
+    }
 
 }

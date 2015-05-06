@@ -228,7 +228,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
         buildGoogleApiClient();
         if (location != null) {
-            Log.e(TAG, "Location: " + location.toString());
             setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
         } else {
             Log.e(TAG, "Null location!");
@@ -369,12 +368,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     public void onConnected(Bundle bundle) {
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        if (mLastLocation != null) {
-            Log.e(TAG, String.valueOf(mLastLocation.getLatitude()));
-            Log.e(TAG, String.valueOf(mLastLocation.getLongitude()));
-        } else {
-            Log.e(TAG, "NUKJKSDHFKJSDFH");
-        }
     }
 
     @Override
