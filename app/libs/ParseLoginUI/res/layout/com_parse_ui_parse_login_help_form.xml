@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@android:color/background_dark">
+    android:background="@android:color/background_light">
 
     <TextView
         android:id="@+id/login_help_instructions"
@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         style="@style/ParseLoginUI.TextView"
         android:gravity="center"
-        android:text="@string/com_parse_ui_login_help_instructions" />
+        android:text="@string/com_parse_ui_login_help_instructions"
+        android:textColor="@android:color/background_dark" />
 
     <EditText
         android:id="@+id/login_help_email_input"
@@ -20,12 +21,13 @@
         android:layout_marginTop="@dimen/com_parse_ui_xlarge_vertical_spacing"
         android:hint="@string/com_parse_ui_login_help_email_input_hint"
         android:inputType="textEmailAddress"
-        android:textColor="@android:color/white"
+        android:textColor="#1976D2"
         android:textColorHint="@android:color/white"></EditText>
 
     <Button
         android:id="@+id/login_help_submit"
         style="@style/ParseLoginUI.Button"
         android:layout_marginTop="@dimen/com_parse_ui_xlarge_vertical_spacing"
-        android:text="@string/com_parse_ui_login_help_submit_button_label" />
+        android:text="@string/com_parse_ui_login_help_submit_button_label"
+        android:background="@android:color/transparent" />
 </LinearLayout>

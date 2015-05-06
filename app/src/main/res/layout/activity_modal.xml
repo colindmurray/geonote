@@ -148,7 +148,6 @@
             android:drawablePadding="5dp"
             android:background="?android:attr/selectableItemBackground"
             android:textSize="17sp"
-            android:layout_alignTop="@+id/post_button"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 </RelativeLayout>
