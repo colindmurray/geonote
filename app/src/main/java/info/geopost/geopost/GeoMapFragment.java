@@ -299,7 +299,7 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
 
     private Marker newDisabledMarker(LatLng loc) {
         MarkerOptions markerOpts =
-                new MarkerOptions().position(loc)
+                new MarkerOptions().position(loc).title(getString(R.string.post_out_of_range))
                         .icon(BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED));
         return mMap.addMarker(markerOpts);
@@ -376,35 +376,56 @@ public class GeoMapFragment extends Fragment implements GoogleMap.OnMarkerClickL
     @Override
     public boolean onMarkerClick(final Marker marker) {
         mSelectedGeoPostMarker = mGeoPostMarkers.get(marker);
-        Log.d(TAG, "Clicked geopost: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
-        mLastVote = mCurrentVote;
-        mCurrentVote = GeoPostObj.getVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj);
+        if(mSelectedGeoPostMarker.enabled) {
+            Log.d(TAG, "Clicked geopost: " + mSelectedGeoPostMarker.geoPostObj.getObjectId());
+            mLastVote = mCurrentVote;
+            mCurrentVote = GeoPostObj.getVoteStatus(mMainActivity.getUserData(), mSelectedGeoPostMarker.geoPostObj);
 
-        mModalUserName.setText(mSelectedGeoPostMarker.geoPostObj.getUser().getUsername());
-        mModalTextBody.setText(mSelectedGeoPostMarker.geoPostObj.getText());
-        mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
-        mModalComments.setText("Comments: " + mSelectedGeoPostMarker.geoPostObj.getCommentCount());
-        setTime();
+            mModalUserName.setText(mSelectedGeoPostMarker.geoPostObj.getUser().getUsername());
+            mModalTextBody.setText(mSelectedGeoPostMarker.geoPostObj.getText());
+            mModalVoteRatio.setText("" + mSelectedGeoPostMarker.geoPostObj.getVotes());
+            mModalComments.setText("Comments: " + mSelectedGeoPostMarker.geoPostObj.getCommentCount());
+            setTime();
 
-        // Zoom to marker click location
-        float zoom = mMap.getCameraPosition().zoom;
-        // Give camera time to move to new location.  Doing this while loading the dialog ended up being
-        // really slow and choppy
-        CameraPosition pos = new CameraPosition(marker.getPosition(), zoom, 0f, 0f);
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos), 400, new GoogleMap.CancelableCallback() {
+            // Zoom to marker click location
+            float zoom = mMap.getCameraPosition().zoom;
+            // Give camera time to move to new location.  Doing this while loading the dialog ended up being
+            // really slow and choppy
+            CameraPosition pos = new CameraPosition(marker.getPosition(), zoom, 0f, 0f);
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos), 400, new GoogleMap.CancelableCallback() {
 
-            @Override
-            public void onFinish() {
-                mMaterialDialog.show();
-            }
+                @Override
+                public void onFinish() {
+                    mMaterialDialog.show();
+                }
 
-            @Override
-            public void onCancel() {
+                @Override
+                public void onCancel() {
 
-            }
-        });
+                }
+            });
 
+        } else {
 
+            float zoom = mMap.getCameraPosition().zoom;
+            // Give camera time to move to new location.  Doing this while loading the dialog ended up being
+            // really slow and choppy
+            CameraPosition pos = new CameraPosition(marker.getPosition(), zoom, 0f, 0f);
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos), 400, new GoogleMap.CancelableCallback() {
+
+                @Override
+                public void onFinish() {
+
+                    Log.d(TAG, "Clicked out of range marker");
+                    mSelectedGeoPostMarker.marker.showInfoWindow();
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+            });
+        }
         return true;
     }
 

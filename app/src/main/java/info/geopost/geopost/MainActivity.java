@@ -62,7 +62,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarManager.On
     public static final int MAX_POST_SEARCH_RESULTS = 75;
     public static final Double DISTANCE_BEFORE_PARSE_UPDATE = 0.5;
 
-    public static final float DEFAULT_SEARCH_DISTANCE = 1000.0f;
+    public static final float DEFAULT_SEARCH_DISTANCE = 10000.0f;
     private static final long PARSE_QUERY_TIMEOUT = 30000;
     private float mRadius = DEFAULT_SEARCH_DISTANCE;
 
