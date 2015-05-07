@@ -127,6 +127,8 @@ public class PostActivity extends ActionBarActivity {
     private void post () {
         GeoPostObj post = new GeoPostObj();
         post.setLocation(mGeoPoint);
+        post.setCommentCount(0);
+        post.setVotes(0);
         String text = getPostEditTextText();
         final ProgressDialog dialog = new ProgressDialog(PostActivity.this);
         dialog.setMessage(getString(R.string.progress_post));
