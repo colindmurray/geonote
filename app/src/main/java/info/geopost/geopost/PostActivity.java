@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -141,6 +142,7 @@ public class PostActivity extends ActionBarActivity {
         acl.setPublicReadAccess(true);
         acl.setPublicWriteAccess(true);
         post.setACL(acl);
+        Log.d("PostActivity", "In post.");
 
         post.saveInBackground(new SaveCallback() {
             @Override

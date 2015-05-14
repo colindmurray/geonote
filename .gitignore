@@ -5,3 +5,4 @@
 /app/libs/ParseLoginUI/build
 .idea
 *.iml
+app/libs/ParseLoginUI/libs
